@@ -1,0 +1,12 @@
+# Py generated files
+*.py[cod]
+
+# Non-source files to exclude
+*.sw[op]
+
+# Exclude commiting scanner binaries and sources
+scanners/binaries/*
+scanners/sources/*
+
+# Docs currently just notes for me, exclude for now
+docs/*
