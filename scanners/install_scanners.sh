@@ -89,9 +89,13 @@ startup_checks
 
 pushd "sources"
 
+# Install the scanners from souce at Github
 install_scanner "OWASP-Nettacker" "source" \
     "https://github.com/zdresearch/OWASP-Nettacker.git"
+install_scanner "testssl.sh" "source" \
+    "https://github.com/drwetter/testssl.sh.git"
 
+# Install these scanners through the package manager
 install_scanner "nikto" "cmd"
 install_scanner "nmap" "cmd"
 install_scanner "skipfish" "cmd"
