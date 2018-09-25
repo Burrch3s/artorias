@@ -3,6 +3,7 @@
 
 # Non-source files to exclude
 *.sw[op]
+*.coverage
 
 # Exclude commiting scanner binaries and sources
 scanners/binaries/*

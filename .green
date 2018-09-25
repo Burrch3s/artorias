@@ -1,0 +1,4 @@
+verbose = 2
+logging = True
+run-coverage = True
+omit-patterns = utils/log.py
