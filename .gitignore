@@ -4,6 +4,7 @@
 # Non-source files to exclude
 *.sw[op]
 *.coverage
+*.xml
 
 # Exclude commiting scanner binaries and sources
 scanners/binaries/*
