@@ -1,8 +1,7 @@
 """The beef of Artorias testing code"""
 
 from argparse import Namespace
-from core.scans import host_scan
-from core.utils import get_hosts, verify_subnet
+from core.utils import get_hosts, verify_subnet, get_services
 
 def handle_test(args: Namespace) -> bool:
     """
@@ -18,5 +17,7 @@ def handle_test(args: Namespace) -> bool:
     if not args.target:
         hosts = get_hosts(subnet)
 
-    print(hosts, subnet)
+    for host in hosts:
+        host.services = get_services(host)
+
     return True
