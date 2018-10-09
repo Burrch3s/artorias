@@ -1,9 +1,8 @@
 # Contains scan functions
 
-from subprocess import Popen
 from datetime import datetime
-from utils.log import low
-from utils.scanners import xml2json
+from subprocess import Popen
+from log import low
 from settings import SCAN_OUTPUT_DIR
 
 def host_scan(subnet: str) -> dict:
@@ -20,9 +19,7 @@ def host_scan(subnet: str) -> dict:
     nmap.wait()
 
     low("Host scan completed.")
-
-    # call xml2json on output file
-    return xml2json(fname)
+    return fname
 
 def port_scan(target: str) -> dict:
     """
@@ -39,6 +36,4 @@ def port_scan(target: str) -> dict:
     nmap.wait()
 
     low("Port scan completed.")
-
-    # call xml2json on output file
-    return xml2json(fname)
+    return fname
