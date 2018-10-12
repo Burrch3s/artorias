@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import call, patch, MagicMock
 from core.utils import *
 
 class TestCoreUtils(unittest.TestCase):
@@ -78,3 +78,30 @@ class TestCoreUtils(unittest.TestCase):
         res = xml2json('mockFile')
         self.assertEquals(res, None)
         self.assertEquals(mock_open.call_count, 2)
+
+    @patch('core.utils.skipfish_scan')
+    @patch('core.utils.nikto_scan')
+    @patch('core.utils.xml2json')
+    def test_web_scan(self, mock_xml, mock_nikto, mock_skip):
+        host = MagicMock()
+        host.services = [
+            {
+                'state': 'open',
+                'id': '80',
+                'name': 'MockPort'
+            },
+            {
+                'state': 'open',
+                'id': '22',
+                'name': 'MockPort2'
+            }
+        ]
+
+        print(mock_xml.mock_calls)
+        drive_web_scan(host)
+        expected_calls = [
+            call(mock_nikto()),
+            call(mock_skip())
+        ]
+        for c in expected_calls:
+            self.assertIn(c, mock_xml.mock_calls)
