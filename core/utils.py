@@ -3,7 +3,7 @@
 from xmltodict import parse
 from json import dumps, loads
 from core.host import Host
-from core.scans import host_scan, port_scan
+from core.scans import *
 from log import error
 
 def get_hosts(subnet: str) -> list:
@@ -37,6 +37,19 @@ def get_services(host: str) -> dict:
         port_info['ports'].append(tmp)
 
     return port_info
+
+
+def drive_web_scan(host: Host) -> None:
+    """
+    Automate web app scanners against the provided host
+    """
+    common_ports = ['80', '443', '8080']
+
+    for port in host.services:
+        if port['id'] in common_ports:
+            # TODO replace with standardized and filtered nikto/skipfish results
+            host.nikto_result.append(xml2json(nikto_scan(host, port['id'])))
+            host.skipfish_result.append(xml2json(skipfish_scan(host, port['id'])))
 
 def verify_subnet(subnet: str) -> str:
     """
