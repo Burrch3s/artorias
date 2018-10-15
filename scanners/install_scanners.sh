@@ -22,14 +22,14 @@ function does_source_exist () {
 
 function does_cmd_exist () {
     cmd=$1
-    rc=$(which $cmd)
+    which $cmd
 
     # Check if cmd found in PATH
-    if [[ ! $rc ]];
+    if [[ ! $? -eq "0" ]];
     then
-        echo 1
+        return 1
     else
-        echo 0
+        return 0
     fi
 }
 
@@ -46,15 +46,31 @@ function install_source () {
         if [[ $? -ne 0 ]];
         then
             echo "[!!] Errors may have occurred installing required packages.."
-            echo "for: OWASP-Nettacker"
+            echo "for: $name"
         else
-            echo "[**] Packages successfully installed for OWASP-Nettacker"
+            echo "[**] Packages successfully installed for $name"
         fi
     fi
 
     popd
 }
 
+function install_cmd () {
+
+    program=$1
+
+    # TODO make more portable by adjusting package manager as well
+    apt-get -y install $program
+
+    if [[ $? -ne 0 ]];
+    then
+        echo "[!!] Errors may hav occurred installing scanner.."
+        echo "for: $program"
+    else
+        echo "[**] Command successfully installed for $program"
+    fi
+
+}
 function install_scanner () {
 
     scanner=$1
@@ -73,6 +89,8 @@ function install_scanner () {
         fi
     else
         chk=$(does_cmd_exist "$scanner")
+        echo 'chk value'
+        echo $chk
         if [[ ! $chk ]];
         then
             echo "[**] Setting up $scanner!"
