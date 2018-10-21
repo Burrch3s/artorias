@@ -3,6 +3,7 @@
 from xmltodict import parse
 from json import dumps, loads
 from core.host import Host
+from core.result import Results
 from core.scans import *
 from log import error
 
@@ -48,8 +49,9 @@ def drive_web_scan(host: Host) -> None:
     for port in host.services:
         if port['id'] in common_ports:
             # TODO replace with standardized and filtered nikto/skipfish results
-            host.nikto_result.append(xml2json(nikto_scan(host, port['id'])))
-            host.skipfish_result.append(xml2json(skipfish_scan(host, port['id'])))
+            host.set_nikto_result(Results('nikto', xml2json(nikto_scan(host, port['id']))))
+            host.skipfish_result(Results('skipfish', xml2json(skipfish_scan(host, port['id']))))
+
 
 def verify_subnet(subnet: str) -> str:
     """
