@@ -117,6 +117,7 @@ install_scanner "testssl.sh" "source" \
 install_scanner "nikto" "cmd"
 install_scanner "nmap" "cmd"
 install_scanner "skipfish" "cmd"
+install_scanner "hydra" "cmd"
 
 echo "[**] All compatable scanners have been added!"
 popd
