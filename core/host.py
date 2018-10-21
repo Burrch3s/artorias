@@ -14,14 +14,14 @@ class Host():
 
         self.open_ports = []
 
-        self.nikto_result = []
+        self.nikto_result = None
 
-        self.skipfish_result = []
+        self.skipfish_result = None
 
     def __str__(self):
         return self.ip
 
-    def has_web_interface() -> bool:
+    def has_web_interface(self) -> bool:
         """
         Determine if host has a port that is commonly known as a web interface
         """

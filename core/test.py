@@ -21,9 +21,9 @@ def handle_test(args: Namespace) -> bool:
 
     # TODO research implementing Threads for this
     for host in hosts:
-        host.services = get_services(host)
+        host.services = get_services(host)['ports']
 
-        if host.web_interface():
+        if host.has_web_interface():
             drive_web_scan(host)
 
     return True
