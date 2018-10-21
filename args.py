@@ -20,6 +20,9 @@ def parse_cmd() -> argparse.Namespace:
         'testSubnet': 'Instead of individual targets, specify network to identify hosts on.',
         'service': "Start WebInterface Service to show/represent results"
     }
+    # TODO remove later
+    print('Right now only test argument is implemented. Args in test should work.')
+    print('No args supplied uses host scan to gather hosts, or use target arg.')
 
     parser = argparse.ArgumentParser()
     subparser = parser.add_subparsers(
