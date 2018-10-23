@@ -71,6 +71,21 @@ function install_cmd () {
     fi
 
 }
+
+function install_cmd_alt () {
+    scanner=$1
+    location=$2
+
+    wget -nd $location
+
+    if [[ $? -ne 0 ]];
+    then
+        echo "[!!] Errors may have occurred installing $scanner.."
+    else
+        echo "[**] Command successfully installed for $scanner"
+    fi
+}
+
 function install_scanner () {
 
     scanner=$1
@@ -82,8 +97,18 @@ function install_scanner () {
         chk=$(does_source_exist "$scanner")
         if [[ ! $chk ]];
         then
-            echo "[**] Setting up the OWASP-Nettacker scanner!"
+            echo "[**] Setting up the $scanner!"
             install_source $scanner $repo
+        else
+            echo "[**] $scanner already installed, skipping install..."
+        fi
+    elif [[ $stype = "alt_cmd" ]];
+    then
+        chk=$(does_cmd_exist "zaproxy")
+        if [[ ! $chk ]];
+        then
+            echo "[**] Setting up the $scanner!"
+            install_cmd_alt $scanner $repo
         else
             echo "[**] $scanner already installed, skipping install..."
         fi
@@ -118,6 +143,7 @@ install_scanner "nikto" "cmd"
 install_scanner "nmap" "cmd"
 install_scanner "skipfish" "cmd"
 install_scanner "hydra" "cmd"
+install_scanner "zaproxy" "alt_cmd" "https://github.com/zaproxy/zaproxy/wiki/Downloads/ZAP_2.7.0_Linux.tar.gz"
 
 echo "[**] All compatable scanners have been added!"
 popd
