@@ -72,20 +72,6 @@ function install_cmd () {
 
 }
 
-function install_cmd_alt () {
-    scanner=$1
-    location=$2
-
-    wget -nd $location
-
-    if [[ $? -ne 0 ]];
-    then
-        echo "[!!] Errors may have occurred installing $scanner.."
-    else
-        echo "[**] Command successfully installed for $scanner"
-    fi
-}
-
 function install_scanner () {
 
     scanner=$1
@@ -102,16 +88,6 @@ function install_scanner () {
         else
             echo "[**] $scanner already installed, skipping install..."
         fi
-    elif [[ $stype = "alt_cmd" ]];
-    then
-        chk=$(does_cmd_exist "zaproxy")
-        if [[ ! $chk ]];
-        then
-            echo "[**] Setting up the $scanner!"
-            install_cmd_alt $scanner $repo
-        else
-            echo "[**] $scanner already installed, skipping install..."
-        fi
     else
         chk=$(does_cmd_exist "$scanner")
         echo 'chk value'
@@ -125,6 +101,26 @@ function install_scanner () {
         fi
     fi
 }
+
+function install_zap () {
+    # I didnt want to have to make custom stuff, but there's really no great way of
+    # automating this scanners installation..
+    wget -nd "https://github.com/zaproxy/zaproxy/wiki/Downloads/ZAP_2.7.0_Linux.tar.gz"
+    tar -xf "ZAP_2.7.0_Linux.tar.gz"
+    pushd "ZAP_2.7.0"
+
+    ln -s "zap.sh" "/usr/bin/zaproxy"
+
+    popd
+
+    if [[ $(which zaproxy) -ne 0 ]];
+    then
+        echo "[!!] Errors may have occurred installing $scanner.."
+    else
+        echo "[**] Command successfully installed for $scanner"
+    fi
+}
+
 
 echo "[**] Installing some scanners for Artorias!!"
 echo "[**] Doing some startup checks.."
@@ -143,7 +139,7 @@ install_scanner "nikto" "cmd"
 install_scanner "nmap" "cmd"
 install_scanner "skipfish" "cmd"
 install_scanner "hydra" "cmd"
-install_scanner "zaproxy" "alt_cmd" "https://github.com/zaproxy/zaproxy/wiki/Downloads/ZAP_2.7.0_Linux.tar.gz"
+install_zap
 
 echo "[**] All compatable scanners have been added!"
 popd
