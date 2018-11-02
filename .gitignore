@@ -9,6 +9,7 @@
 # Exclude commiting scanner binaries and sources
 scanners/binaries/*
 scanners/sources/*
+scanners/*.txt
 
 # Docs currently just notes for me, exclude for now
 docs/*
