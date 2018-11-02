@@ -2,6 +2,5 @@ ansicolors
 argparse
 green
 requests
-unittests
 xmltodict
 python-owasp-zap-v2.4
