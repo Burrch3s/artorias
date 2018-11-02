@@ -18,6 +18,8 @@ def parse_cmd() -> argparse.Namespace:
         'testAll': "Run all tests possible",
         'testTarget': "Target(s) to run tests on",
         'testSubnet': 'Instead of individual targets, specify network to identify hosts on.',
+        'testUser': 'Username to use for authenticating with services. Must be supplied with password.',
+        'testPass': 'Password to use for authticating with services. Must be supplied with username.',
         'service': "Start WebInterface Service to show/represent results"
     }
     # TODO remove later
@@ -62,5 +64,17 @@ def parse_cmd() -> argparse.Namespace:
         type=str,
         default='192.168.0.0/24',
         help=msg['testSubnet'])
+    test.add_argument(
+        "-u",
+        "--user",
+        type=str,
+        default=None,
+        help=msg['testUser'])
+    test.add_argument(
+        "-p",
+        "--passwd",
+        type=str,
+        default=None,
+        help=msg['testPass'])
 
     return parser.parse_args()
