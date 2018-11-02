@@ -23,6 +23,9 @@ def handle_test(args: Namespace) -> bool:
     for host in hosts:
         host.services = get_services(host)['ports']
 
+        if host.has_auth_surface():
+            drive_auth_scan(host)
+
         if host.has_web_interface():
             drive_web_scan(host)
 

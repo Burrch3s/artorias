@@ -53,6 +53,24 @@ def drive_web_scan(host: Host) -> None:
             host.skipfish_result(Results('skipfish', xml2json(skipfish_scan(host, port['id']))))
 
 
+def drive_auth_scan(host: Host) -> None:
+    """
+    Automate hydra auth scan against the provided host
+    """
+    hydra_ports = {
+        '80': 'http',
+        '443': 'https',
+        '21': 'ftp',
+        '22': 'ssh',
+        '23': 'telnet'
+    }
+
+    for port in host.services:
+        if port['id'] in hydra_ports:
+            creds = json.loads(hydra_scan(host, port['id'], hydra_ports[port]))
+            user = creds['results']['login']
+            pw = creds['results']['password']
+
 def verify_subnet(subnet: str) -> str:
     """
         Verify and return valid subnet

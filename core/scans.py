@@ -4,7 +4,7 @@ from datetime import datetime
 from subprocess import Popen
 from core.host import Host
 from log import low
-from settings import SCAN_OUTPUT_DIR
+from settings import SCAN_OUTPUT_DIR, WORD_LIST
 
 def host_scan(subnet: str) -> str:
     """
@@ -44,7 +44,7 @@ def nikto_scan(target: Host, port: str) -> str:
         Drive Nikto scan against a specified port, save output to a file and return
         output file name.
     """
-    # # File name to save output to
+    # File name to save output to
     fname = '{}/nikto_scan{}_{}.xml'.format(SCAN_OUTPUT_DIR, port, datetime.now().strftime(
         '%m-%d_%H-%M-%S'))
 
@@ -60,7 +60,7 @@ def nikto_scan_auth(target: Host, port: str, user: str, pw: str) -> str:
     """
         Nikto scan with auth supplied, saves output to a file and returns the file name
     """
-    # # File name to save output to
+    # File name to save output to
     fname = '{}/nikto_scan{}_{}.xml'.format(SCAN_OUTPUT_DIR, port, datetime.now().strftime(
         '%m-%d_%H-%M-%S'))
 
@@ -78,7 +78,7 @@ def skipfish_scan(target: Host, port: str) -> str:
         Drive Skipfish scan against a specified port, save output to a file and return
         outpu file name.
     """
-    # # File name to save output to
+    # File name to save output to
     fname = '{}/skipfish_scan{}_{}.xml'.format(SCAN_OUTPUT_DIR, port, datetime.now().strftime(
         '%m-%d_%H-%M-%S'))
 
@@ -89,3 +89,33 @@ def skipfish_scan(target: Host, port: str) -> str:
 
     low('Skipfish scan completed.')
     return fname
+
+def hydra_scan(target: Host, service: str) -> str:
+    """
+        Hydra scan to retrieve brute force credentials
+    """
+    # File name to save output to
+    fname = '{}/hydra_scan{}_{}.xml'.format(SCAN_OUTPUT_DIR, service, datetime.now().strftime(
+        '%m-%d_%H-%M-%S'))
+
+    hydra = Popen([
+        'hydra', '-L', WORD_LIST, '-P', WORD_LIST, '-u', '-f', '-o', fname,
+        "-b", "json", "{}://{}".format(str(target), service)])
+    low('Waiting for hydra scan on {} to complete.'.format(service))
+
+    hydra.wait()
+
+    low('Hydra scan completed.')
+    return fname
+
+def zap_quickurl(target: Host, port: str) -> str:
+    """
+        OWASP-Zap scan to quickly scan web app elements. Uses the zaproxy command in cmd mode.
+    """
+    return
+
+def zap_spider(target: Host, port: str) -> str:
+    """
+        TODO implement with Zap API
+    """
+    return
