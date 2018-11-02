@@ -1,7 +1,9 @@
 # Contains scan functions
 
 from datetime import datetime
+from time import sleep
 from subprocess import Popen
+from zapv2 import ZAPv2
 from core.host import Host
 from log import *
 from settings import SCAN_OUTPUT_DIR, WORD_LIST
@@ -120,6 +122,44 @@ def zap_quickurl(target: Host, port: str) -> str:
 
 def zap_spider(target: Host, port: str) -> str:
     """
-        TODO implement with Zap API
+        Zap spider scan of web interface
     """
-    return
+    # Default listening for zap is 8090
+    zap = ZAPv2()
+
+    if port == '443':
+        url = "https:{}".format(str(target))
+    else:
+        url = "http://{}".format(str(target))
+
+    low("Beginning zap spider on {}".format(url))
+    zap.urlopen(url)
+    sleep(1)
+
+    # TODO consider making this wait more smart
+    spider_id = zap.spider.scan(url)
+    sleep(1)
+    low("Waiting for scan to complete".format(url))
+    while int(zap.spider.status(spider_id)) < 100:
+        sleep(1)
+
+    low("Spider scan complete.")
+    low("Collectint any alerts from spider.")
+    while int(zap.pscan.records_to_scan) > 0:
+        sleep(1)
+
+    low("Alerts collected.")
+
+    xml = zap.core.xmlreport()
+    fname = '{}/zap_spider_{}.json'.format(SCAN_OUTPUT_DIR, datetime.now().strftime(
+        '%m-%d_%H-%M-%S'))
+
+    with open(fname, "w") as f:
+        f.write(xml)
+
+    return fname
+
+def zap_spider_auth(target: Host, port: str, user: str, passwd: str) -> str:
+    """
+        Zap spider scan with auth.
+    """
