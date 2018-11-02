@@ -3,7 +3,7 @@
 from datetime import datetime
 from subprocess import Popen
 from core.host import Host
-from log import low
+from log import *
 from settings import SCAN_OUTPUT_DIR, WORD_LIST
 
 def host_scan(subnet: str) -> str:
@@ -95,15 +95,19 @@ def hydra_scan(target: Host, port: str, service: str) -> str:
         Hydra scan to retrieve brute force credentials
     """
     # File name to save output to
-    fname = '{}/hydra_scan{}_{}.xml'.format(SCAN_OUTPUT_DIR, service, datetime.now().strftime(
+    fname = '{}/hydra_scan{}_{}.json'.format(SCAN_OUTPUT_DIR, service, datetime.now().strftime(
         '%m-%d_%H-%M-%S'))
 
-    hydra = Popen([
-        'hydra', '-L', WORD_LIST, '-P', WORD_LIST, '-u', '-f', '-o', fname,
-        "-b", "json", "{}://{}".format(service, str(target))])
-    low('Waiting for hydra scan on {} to complete.'.format(service))
+    try:
+        warning("Brute forcing credentials can take a long time, CTRL-C once to abort.")
+        hydra = Popen([
+            'hydra', '-L', WORD_LIST, '-P', WORD_LIST, '-u', '-f', '-o', fname,
+            "-b", "json", "{}://{}".format(service, str(target))])
 
-    hydra.wait()
+        low('Waiting for hydra scan on {} to complete.'.format(service))
+        hydra.wait()
+    except KeyboardInterrupt:
+        low("Hydra scan aborted. Other scans may not be as effective without credentials.")
 
     low('Hydra scan completed.')
     return fname

@@ -5,7 +5,7 @@ from json import dumps, loads
 from core.host import Host
 from core.result import Results
 from core.scans import *
-from log import error
+from log import *
 
 def get_hosts(subnet: str) -> list:
     """
@@ -37,23 +37,29 @@ def get_services(host: str) -> dict:
         tmp['state'] = port['state']['@state']
         port_info['ports'].append(tmp)
 
+    debug("port_info {}".format(port_info))
     return port_info
 
 
-def drive_web_scan(host: Host) -> None:
+def drive_web_scan(host: Host, auth: bool) -> None:
     """
     Automate web app scanners against the provided host
     """
     common_ports = ['80', '443', '8080']
 
-    for port in host.services:
+    for port in host.get_services():
         if port['id'] in common_ports:
             # TODO replace with standardized and filtered nikto/skipfish results
-            host.set_nikto_result(Results('nikto', xml2json(nikto_scan(host, port['id']))))
-            host.skipfish_result(Results('skipfish', xml2json(skipfish_scan(host, port['id']))))
+            if not auth:
+                host.set_nikto_result(Results('nikto', xml2json(nikto_scan(host, port['id']))))
+                host.skipfish_result(Results('skipfish', xml2json(skipfish_scan(host, port['id']))))
+            else:
+                creds = host.get_credentials()
+                host.set_nikto_result(
+                    Results('nikto', xml2json(
+                        nikto_scan_auth(host, port['id'], creds['user'], creds['passwd']))))
 
-
-def drive_auth_scan(host: Host) -> None:
+def drive_auth_scan(host: Host) -> bool:
     """
     Automate hydra auth scan against the provided host
     """
@@ -65,12 +71,22 @@ def drive_auth_scan(host: Host) -> None:
         '23': 'telnet'
     }
 
-    for port in host.services:
+    for port in host.get_services():
         if port['id'] in hydra_ports:
-            creds = loads(hydra_scan(host, port['id'], hydra_ports[port]))
-            user = creds['results']['login']
-            pw = creds['results']['password']
-            host.set_credentials({user:pw})
+            debug("{} {}".format(port, port['id']))
+            fname = hydra_scan(host, port['id'], hydra_ports[port['id']])
+            try:
+                with open(fname) as f:
+                    creds = loads(f.read())
+
+                user = creds['results'][0]['login']
+                pw = creds['results'][0]['password']
+                host.set_credentials({'user': user, 'passwd': pw})
+            except Exception as e:
+                error("Error occurred: {}. Unable to get credentials.".format(e))
+                return False
+
+            return True
 
 def verify_subnet(subnet: str) -> str:
     """
