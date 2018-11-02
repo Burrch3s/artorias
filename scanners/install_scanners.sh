@@ -157,11 +157,12 @@ then
 fi
 
 # Install these scanners through the package manager
-#install_scanner "nikto" "cmd"
-#install_scanner "nmap" "cmd"
-#install_scanner "skipfish" "cmd"
-#install_zap
-#get_wordlist
+install_scanner "nikto" "cmd"
+nikto -update
+install_scanner "nmap" "cmd"
+install_scanner "skipfish" "cmd"
+install_zap
+get_wordlist
 
 echo "[**] All compatable scanners have been added!"
 popd
