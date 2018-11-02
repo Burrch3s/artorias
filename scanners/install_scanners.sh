@@ -81,7 +81,7 @@ function install_scanner () {
     if [[ $stype = "source" ]];
     then
         chk=$(does_source_exist "$scanner")
-        if [[ ! $chk ]];
+        if [[ $chk -ne 0 ]];
         then
             echo "[**] Setting up the $scanner!"
             install_source $scanner $repo
@@ -90,9 +90,7 @@ function install_scanner () {
         fi
     else
         chk=$(does_cmd_exist "$scanner")
-        echo 'chk value'
-        echo $chk
-        if [[ ! $chk ]];
+        if [[ $chk -ne 0 ]];
         then
             echo "[**] Setting up $scanner!"
             install_cmd $scanner
@@ -115,12 +113,17 @@ function install_zap () {
 
     if [[ $(which zaproxy) -ne 0 ]];
     then
-        echo "[!!] Errors may have occurred installing $scanner.."
+        echo "[!!] Errors may have occurred installing OWASP-Zap.."
     else
-        echo "[**] Command successfully installed for $scanner"
+        echo "[**] Command successfully installed for OWASP-Zap"
     fi
 }
 
+function get_wordlist () {
+    url="downloads.skullsecurity.org/passwords/rockyou.txt.bz2"
+    wget -nd $url
+    bzip2 -d rockyou.txt.bz2
+}
 
 echo "[**] Installing some scanners for Artorias!!"
 echo "[**] Doing some startup checks.."
@@ -133,13 +136,32 @@ install_scanner "OWASP-Nettacker" "source" \
     "https://github.com/zdresearch/OWASP-Nettacker.git"
 install_scanner "testssl.sh" "source" \
     "https://github.com/drwetter/testssl.sh.git"
+# Needed custom code for getting latest hydra version for output formats
+chk=$(does_source_exist "hydra")
+if [[ $chk -ne 0 ]];
+then
+    apt-get install -y "libssl-dev libssh-dev libidn11-dev libpcre3-dev" \
+                    "libgtk2.0-dev libmysqlclient-dev libpq-dev libsvn-dev" \
+                    "firebird-dev"
+    git clone https://github.com/vanhauser-thc/thc-hydra.git
+    pushd thc-hydra
+    ./configure && make && make install
+    if [[ $? -ne 0 ]];
+    then 
+        echo "[!!] Errors may have occurred configuring scanner from source.."
+        echo "for: hydra"
+    else
+        echo "[**] Packages successfully installed for hydra"
+    fi
+    popd
+fi
 
 # Install these scanners through the package manager
-install_scanner "nikto" "cmd"
-install_scanner "nmap" "cmd"
-install_scanner "skipfish" "cmd"
-install_scanner "hydra" "cmd"
-install_zap
+#install_scanner "nikto" "cmd"
+#install_scanner "nmap" "cmd"
+#install_scanner "skipfish" "cmd"
+#install_zap
+#get_wordlist
 
 echo "[**] All compatable scanners have been added!"
 popd
