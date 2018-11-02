@@ -4,4 +4,4 @@ green
 requests
 unittests
 xmltodict
-zap
+python-owasp-zap-v2.4
