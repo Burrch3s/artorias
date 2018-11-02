@@ -79,12 +79,13 @@ class TestCoreUtils(unittest.TestCase):
         self.assertEquals(res, None)
         self.assertEquals(mock_open.call_count, 2)
 
+    @patch('core.utils.nikto_scan_auth')
     @patch('core.utils.skipfish_scan')
     @patch('core.utils.nikto_scan')
     @patch('core.utils.xml2json')
-    def test_web_scan(self, mock_xml, mock_nikto, mock_skip):
+    def test_web_scan(self, mock_xml, mock_nikto, mock_skip, mock_nikto_auth):
         host = MagicMock()
-        host.services = [
+        host.get_services.return_value = [
             {
                 'state': 'open',
                 'id': '80',
@@ -96,12 +97,19 @@ class TestCoreUtils(unittest.TestCase):
                 'name': 'MockPort2'
             }
         ]
+        host.get_credentials.return_value = {'user': 'user', 'passwd': 'password'}
 
-        print(mock_xml.mock_calls)
-        drive_web_scan(host)
+        drive_web_scan(host, False)
         expected_calls = [
             call(mock_nikto()),
             call(mock_skip())
+        ]
+        for c in expected_calls:
+            self.assertIn(c, mock_xml.mock_calls)
+
+        drive_web_scan(host, True)
+        expected_calls = [
+            call(mock_nikto_auth('user', 'passwd')),
         ]
         for c in expected_calls:
             self.assertIn(c, mock_xml.mock_calls)
