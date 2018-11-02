@@ -23,7 +23,7 @@ class Host():
         self._credentials = {}
 
     def __str__(self):
-        return self.ip
+        return self._ip
 
     def get_ip(self) -> str:
         return self._ip
@@ -52,14 +52,14 @@ class Host():
     def set_skipfish_result(self, result: Results) -> None:
         self._skipfish_result = result
 
-    def set_credentials(self, cred: dict) -> None:
-        self._credentials = creds
+    def set_credentials(self, creds: dict) -> None:
+        self._credentials.update(creds)
 
     def has_web_interface(self) -> bool:
         """
         Determine if host has a port that is commonly known as a web interface
         """
-        for service in self.services:
+        for service in self._services:
             if service['id'] in ('80', '443', '8080'):
                 return True
         return False
@@ -70,7 +70,7 @@ class Host():
         credentials.
         """
         auth = ['80', '443', '21', '22', '23']
-        for service in self.services:
+        for service in self._services:
             if service['id'] in auth:
                 return True
         return False

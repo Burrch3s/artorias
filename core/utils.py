@@ -67,9 +67,10 @@ def drive_auth_scan(host: Host) -> None:
 
     for port in host.services:
         if port['id'] in hydra_ports:
-            creds = json.loads(hydra_scan(host, port['id'], hydra_ports[port]))
+            creds = loads(hydra_scan(host, port['id'], hydra_ports[port]))
             user = creds['results']['login']
             pw = creds['results']['password']
+            host.set_credentials({user:pw})
 
 def verify_subnet(subnet: str) -> str:
     """
@@ -77,10 +78,9 @@ def verify_subnet(subnet: str) -> str:
     """
     if len(subnet.split('.')) != 4:
         return ''
-    elif len(subnet.split('/')) != 2:
+    if len(subnet.split('/')) != 2:
         return ''
-    else:
-        return subnet
+    return subnet
 
 def xml2json(sfile: str) -> dict:
     """

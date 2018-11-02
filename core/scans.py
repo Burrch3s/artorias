@@ -90,7 +90,7 @@ def skipfish_scan(target: Host, port: str) -> str:
     low('Skipfish scan completed.')
     return fname
 
-def hydra_scan(target: Host, service: str) -> str:
+def hydra_scan(target: Host, port: str, service: str) -> str:
     """
         Hydra scan to retrieve brute force credentials
     """
@@ -100,7 +100,7 @@ def hydra_scan(target: Host, service: str) -> str:
 
     hydra = Popen([
         'hydra', '-L', WORD_LIST, '-P', WORD_LIST, '-u', '-f', '-o', fname,
-        "-b", "json", "{}://{}".format(str(target), service)])
+        "-b", "json", "{}://{}".format(service, str(target))])
     low('Waiting for hydra scan on {} to complete.'.format(service))
 
     hydra.wait()
