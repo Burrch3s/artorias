@@ -166,8 +166,8 @@ def zap_spider(target: Host, port: str) -> str:
     zap.urlopen(url)
     sleep(1)
 
-    # TODO consider making this wait more smart
-    spider_id = zap.spider.scan(url)
+    # Scanning as user, just in case forced user mode is wonky
+    spider_id = zap.spider.scanAsUser(context_id, user_id, url)
     sleep(1)
     low("Waiting for scan to complete".format(url))
     while int(zap.spider.status(spider_id)) < 100:
