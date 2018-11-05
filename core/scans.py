@@ -139,6 +139,9 @@ def zap_setup_context(target: Host, port: str, user: str, passwd: str) -> tuple:
     zap.users.setAuthenticationCredentials(
         context_id, user_id, "username={}&password={}".format(user, passwd))
 
+    zap.forcedUser.setForcedUser(context_id, user_id)
+    zap.setForcedUserModeEnabled(True)
+
     return context_id, user_id
 
 def zap_quickurl(target: Host, port: str) -> str:
