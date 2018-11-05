@@ -18,7 +18,7 @@ class Host():
 
         self._nikto_result = None
 
-        self._skipfish_result = None
+        self._zap_result = None
 
         self._credentials = {}
 
@@ -34,8 +34,8 @@ class Host():
     def get_nikto_result(self) -> Results:
         return self._nikto_result
 
-    def get_skipfish_result(self) -> Results:
-        return self._skipfish_result
+    def get_zap_result(self) -> Results:
+        return self._zap_result
 
     def get_credentials(self) -> dict:
         return self._credentials
@@ -49,8 +49,8 @@ class Host():
     def set_nikto_result(self, result: Results) -> None:
         self._nikto_result = result
 
-    def set_skipfish_result(self, result: Results) -> None:
-        self._skipfish_result = result
+    def set_zap_result(self, result: Results) -> None:
+        self._zap_result = result
 
     def set_credentials(self, creds: dict) -> None:
         self._credentials.update(creds)

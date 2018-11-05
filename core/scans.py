@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from time import sleep
-from subprocess import Popen
+from subprocess import Popen, DEVNULL
 from zapv2 import ZAPv2
 from core.host import Host
 from log import *
@@ -16,7 +16,7 @@ def host_scan(subnet: str) -> str:
     fname = '{}/host_scan{}.xml'.format(SCAN_OUTPUT_DIR, datetime.now().strftime('%m-%d_%H-%M-%S'))
 
     # Drive host scan and output to file
-    nmap = Popen(['nmap', subnet, '-sn', '-oX', fname], stdout=None)
+    nmap = Popen(['nmap', subnet, '-sn', '-oX', fname], stdout=DEVNULL, stderr=DEVNULL)
     low("Waiting for host scan to complete.")
 
     nmap.wait()
@@ -33,7 +33,7 @@ def port_scan(target: str) -> str:
     fname = '{}/port_scan{}.xml'.format(SCAN_OUTPUT_DIR, datetime.now().strftime('%m-%d_%H-%M-%S'))
 
     # Drive host scan and output to file
-    nmap = Popen(['nmap', str(target), '-oX', fname])
+    nmap = Popen(['nmap', str(target), '-oX', fname], stdout=DEVNULL, stderr=DEVNULL)
     low("Waiting for port scan to complete.")
 
     nmap.wait()
@@ -50,6 +50,8 @@ def nikto_scan(target: Host, port: str) -> str:
     fname = '{}/nikto_scan{}_{}.xml'.format(SCAN_OUTPUT_DIR, port, datetime.now().strftime(
         '%m-%d_%H-%M-%S'))
 
+    # This scanner can be helpful with stdout since it doesnt flood logs and can
+    # be polled for progress of the scan
     nikto = Popen(['nikto', '-host', str(target), '-port', port, '-output', fname])
     low('Waiting for Nikto scan on port {} to complete'.format(port))
 
@@ -151,7 +153,7 @@ def zap_spider(target: Host, port: str) -> str:
     low("Alerts collected.")
 
     xml = zap.core.xmlreport()
-    fname = '{}/zap_spider_{}.json'.format(SCAN_OUTPUT_DIR, datetime.now().strftime(
+    fname = '{}/zap_spider_{}.xml'.format(SCAN_OUTPUT_DIR, datetime.now().strftime(
         '%m-%d_%H-%M-%S'))
 
     with open(fname, "w") as f:

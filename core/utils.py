@@ -2,10 +2,13 @@
 
 from xmltodict import parse
 from json import dumps, loads
+from retrying import retry
+from subprocess import Popen, DEVNULL
 from core.host import Host
 from core.result import Results
 from core.scans import *
 from log import *
+from zapv2 import ZAPv2
 
 def get_hosts(subnet: str) -> list:
     """
@@ -41,6 +44,25 @@ def get_services(host: str) -> dict:
     return port_info
 
 
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
+def wait_for_zap():
+    """
+    Wait until the python api is able to interact with the zaproxy application.
+    If after retries it doesnt work, raise zap error.
+    """
+    zap = ZAPv2()
+    zap.urlopen('http://127.0.0.1')
+
+
+def start_zap():
+    """
+    Start up the Zaproxy application so the python API can communicate with it.
+    """
+    low("Starting the zaproxy application.")
+    zap_app = Popen(['zaproxy'], stdout=DEVNULL, stderr=DEVNULL)
+    wait_for_zap()
+
+
 def drive_web_scan(host: Host, auth: bool) -> None:
     """
     Automate web app scanners against the provided host
@@ -49,15 +71,17 @@ def drive_web_scan(host: Host, auth: bool) -> None:
 
     for port in host.get_services():
         if port['id'] in common_ports:
+            start_zap()
             # TODO replace with standardized and filtered nikto/skipfish results
             if not auth:
                 host.set_nikto_result(Results('nikto', xml2json(nikto_scan(host, port['id']))))
-                host.skipfish_result(Results('skipfish', xml2json(skipfish_scan(host, port['id']))))
+                host.set_zap_result(Results('zap spider', xml2json(zap_spider(host, port['id']))))
             else:
                 creds = host.get_credentials()
                 host.set_nikto_result(
                     Results('nikto', xml2json(
                         nikto_scan_auth(host, port['id'], creds['user'], creds['passwd']))))
+                host.set_zap_result(Results('zap spider', xml2json(zap_spider(host, port['id']))))
 
 def drive_auth_scan(host: Host) -> bool:
     """
