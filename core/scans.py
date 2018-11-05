@@ -116,6 +116,31 @@ def hydra_scan(target: Host, port: str, service: str) -> str:
     low('Hydra scan completed.')
     return fname
 
+def zap_setup_context(target: Host, port: str, user: str, passwd: str) -> tuple:
+    """
+    Creates a context for this scan, adding a new user to that context and sets up
+    the authentication mechanism.
+    """
+    zap = ZAPv2()
+
+    if port == '443':
+        url = "https:{}".format(str(target))
+    else:
+        url = "http://{}".format(str(target))
+
+    low("Creating new context for zap scan.")
+    context_id = zap.context.newContext("ZapScan")
+    zap.context.includeInContext("ZapScan", "{}.*".format(str(target)))
+    zap.authentication.setAuthenticationMethod(
+        context_id, 'httpAuthentication', 'hostname={}&realm='.format(str(target)))
+
+    low("Creating user for context.")
+    user_id = zap.users.newUser(context_id, "zapuser")
+    zap.users.setAuthenticationCredentials(
+        context_id, user_id, "username={}&password={}".format(user, passwd))
+
+    return context_id, user_id
+
 def zap_quickurl(target: Host, port: str) -> str:
     """
         OWASP-Zap scan to quickly scan web app elements. Uses the zaproxy command in cmd mode.
@@ -165,3 +190,31 @@ def zap_spider_auth(target: Host, port: str, user: str, passwd: str) -> str:
     """
         Zap spider scan with auth.
     """
+    context_id, user_id = zap_setup_context, target, port, user, passwd)
+
+    low("Beginning zap spider on {}".format(url))
+    zap.urlopen(url)
+    sleep(1)
+
+    # TODO consider making this wait more smart
+    spider_id = zap.spider.scan(url)
+    sleep(1)
+    low("Waiting for scan to complete".format(url))
+    while int(zap.spider.status(spider_id)) < 100:
+        sleep(1)
+
+    low("Spider scan complete.")
+    low("Collectint any alerts from spider.")
+    while int(zap.pscan.records_to_scan) > 0:
+        sleep(1)
+
+    low("Alerts collected.")
+
+    xml = zap.core.xmlreport()
+    fname = '{}/zap_spider_{}.xml'.format(SCAN_OUTPUT_DIR, datetime.now().strftime(
+        '%m-%d_%H-%M-%S'))
+
+    with open(fname, "w") as f:
+        f.write(xml)
+
+    return fname
