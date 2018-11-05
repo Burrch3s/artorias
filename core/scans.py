@@ -129,18 +129,22 @@ def zap_setup_context(target: Host, port: str, user: str, passwd: str) -> tuple:
         url = "http://{}".format(str(target))
 
     low("Creating new context for zap scan.")
-    context_id = zap.context.newContext("ZapScan")
-    zap.context.includeInContext("ZapScan", "{}.*".format(str(target)))
-    zap.authentication.setAuthenticationMethod(
+    context_id = zap.context.new_context("ZapScan")
+
+    # Default listening for zap is 8090
+    zap.context.include_in_context("ZapScan", "{}.*".format(str(target)))
+    zap.context.include_in_context("ZapScan", "{}.*".format(url))
+    zap.authentication.set_authentication_method(
         context_id, 'httpAuthentication', 'hostname={}&realm='.format(str(target)))
 
     low("Creating user for context.")
-    user_id = zap.users.newUser(context_id, "zapuser")
-    zap.users.setAuthenticationCredentials(
+    user_id = zap.users.new_user(context_id, "zapuser")
+    zap.users.set_authentication_credentials(
         context_id, user_id, "username={}&password={}".format(user, passwd))
+    zap.users.set_user_enabled(context_id, user_id, True)
 
-    zap.forcedUser.setForcedUser(context_id, user_id)
-    zap.setForcedUserModeEnabled(True)
+    zap.forcedUser.set_forced_user(context_id, user_id)
+    zap.forcedUser.set_forced_user_mode_enabled(True)
 
     return context_id, user_id
 
@@ -154,7 +158,6 @@ def zap_spider(target: Host, port: str) -> str:
     """
         Zap spider scan of web interface
     """
-    # Default listening for zap is 8090
     zap = ZAPv2()
 
     if port == '443':
@@ -167,7 +170,7 @@ def zap_spider(target: Host, port: str) -> str:
     sleep(1)
 
     # Scanning as user, just in case forced user mode is wonky
-    spider_id = zap.spider.scanAsUser(context_id, user_id, url)
+    spider_id = zap.spider.scan(url)
     sleep(1)
     low("Waiting for scan to complete".format(url))
     while int(zap.spider.status(spider_id)) < 100:
@@ -193,14 +196,22 @@ def zap_spider_auth(target: Host, port: str, user: str, passwd: str) -> str:
     """
         Zap spider scan with auth.
     """
-    context_id, user_id = zap_setup_context, target, port, user, passwd)
+    if port == '443':
+        url = "https:{}".format(str(target))
+    else:
+        url = "http://{}".format(str(target))
+
+    context_id, user_id = zap_setup_context(target, port, user, passwd)
+
+    zap = ZAPv2()
 
     low("Beginning zap spider on {}".format(url))
     zap.urlopen(url)
     sleep(1)
 
     # TODO consider making this wait more smart
-    spider_id = zap.spider.scan(url)
+    spider_id = zap.spider.scan_as_user(context_id, user_id, url)
+
     sleep(1)
     low("Waiting for scan to complete".format(url))
     while int(zap.spider.status(spider_id)) < 100:

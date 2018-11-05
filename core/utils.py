@@ -44,7 +44,7 @@ def get_services(host: str) -> dict:
     return port_info
 
 
-@retry(stop_max_attempt_number=10, wait_fixed=1000)
+@retry(stop_max_attempt_number=20, wait_fixed=1000)
 def wait_for_zap():
     """
     Wait until the python api is able to interact with the zaproxy application.
@@ -52,6 +52,7 @@ def wait_for_zap():
     """
     zap = ZAPv2()
     zap.urlopen('http://127.0.0.1')
+    sleep(3)
 
 
 def start_zap():
@@ -75,13 +76,15 @@ def drive_web_scan(host: Host, auth: bool) -> None:
             # TODO replace with standardized and filtered nikto/skipfish results
             if not auth:
                 host.set_nikto_result(Results('nikto', xml2json(nikto_scan(host, port['id']))))
-                host.set_zap_result(Results('zap spider', xml2json(zap_spider(host, port['id']))))
+                host.set_zap_result(Results('zap_spider', xml2json(zap_spider(host, port['id']))))
             else:
                 creds = host.get_credentials()
                 host.set_nikto_result(
                     Results('nikto', xml2json(
                         nikto_scan_auth(host, port['id'], creds['user'], creds['passwd']))))
-                host.set_zap_result(Results('zap spider', xml2json(zap_spider(host, port['id']))))
+                host.set_zap_result(
+                    Results('zap_spider', xml2json(
+                        zap_spider_auth(host, port['id'], creds['user'], creds['passwd']))))
 
 def drive_auth_scan(host: Host) -> bool:
     """
