@@ -17,7 +17,7 @@ class Results():
     def __int__(self):
         return len(self._results)
 
-    def get__results(self):
+    def get_results(self):
         return self._results
 
     def set_results(self, res):
