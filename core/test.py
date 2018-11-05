@@ -55,9 +55,8 @@ def handle_test(args: Namespace) -> bool:
             low("Host {} has a web interface, beginning scan.".format(host))
             drive_web_scan(host, login_found)
 
-        for host in hosts:
-            debug("{} {} {} {} {}".format(
-                str(host), host.get_services(), host.get_credentials(),
-                host.get_nikto_result().get_results(), host.get_zap_result().get_results()))
+        debug("{} {} {} {} {}".format(
+            str(host), host.get_services(), host.get_credentials(),
+            host.get_nikto_result().get_results(), host.get_zap_result().get_results()))
 
     return True
