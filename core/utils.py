@@ -76,15 +76,17 @@ def drive_web_scan(host: Host, auth: bool) -> None:
             # TODO replace with standardized and filtered nikto/skipfish results
             if not auth:
                 host.set_nikto_result(Results('nikto', xml2json(nikto_scan(host, port['id']))))
-                host.set_zap_result(Results('zap_spider', xml2json(zap_spider(host, port['id']))))
+                host.set_zap_result(Results('zap_spider', loads(zap_spider(host, port['id']))))
             else:
                 creds = host.get_credentials()
                 host.set_nikto_result(
                     Results('nikto', xml2json(
                         nikto_scan_auth(host, port['id'], creds['user'], creds['passwd']))))
-                host.set_zap_result(
-                    Results('zap_spider', xml2json(
-                        zap_spider_auth(host, port['id'], creds['user'], creds['passwd']))))
+                zap_results = zap_spider_auth(host, port['id'], creds['user'], creds['passwd'])
+                with open(zap_results, 'r') as f:
+                    results = f.read()
+
+                host.set_zap_result(Results('zap_spider', loads(results)))
 
 def drive_auth_scan(host: Host) -> bool:
     """

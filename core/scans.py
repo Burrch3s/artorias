@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from time import sleep
+from json import dumps, loads
 from subprocess import Popen, DEVNULL
 from zapv2 import ZAPv2
 from core.host import Host
@@ -183,12 +184,12 @@ def zap_spider(target: Host, port: str) -> str:
 
     low("Alerts collected.")
 
-    xml = zap.core.xmlreport()
-    fname = '{}/zap_spider_{}.xml'.format(SCAN_OUTPUT_DIR, datetime.now().strftime(
+    json = zap.core.jsonreport()
+    fname = '{}/zap_spider_{}.json'.format(SCAN_OUTPUT_DIR, datetime.now().strftime(
         '%m-%d_%H-%M-%S'))
 
     with open(fname, "w") as f:
-        f.write(xml)
+        f.write(json)
 
     return fname
 
@@ -224,11 +225,11 @@ def zap_spider_auth(target: Host, port: str, user: str, passwd: str) -> str:
 
     low("Alerts collected.")
 
-    xml = zap.core.xmlreport()
-    fname = '{}/zap_spider_{}.xml'.format(SCAN_OUTPUT_DIR, datetime.now().strftime(
+    json = zap.core.jsonreport()
+    fname = '{}/zap_spider_{}.json'.format(SCAN_OUTPUT_DIR, datetime.now().strftime(
         '%m-%d_%H-%M-%S'))
 
     with open(fname, "w") as f:
-        f.write(xml)
+        f.write(json)
 
     return fname
