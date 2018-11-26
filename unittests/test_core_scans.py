@@ -13,7 +13,7 @@ class TestCoreScans(unittest.TestCase):
 
         expected_calls = [
             call(['nmap', 'MockSubnet', '-sn', '-oX', 'core/outputs/host_scanMockTime.xml'],
-                 stdout=None),
+                 stderr=-3, stdout=-3),
             call().wait()
         ]
         for c in expected_calls:
@@ -30,7 +30,7 @@ class TestCoreScans(unittest.TestCase):
         ret = port_scan('MockSubnet')
 
         expected_calls = [
-            call(['nmap', 'MockSubnet', '-oX', 'core/outputs/port_scanMockTime.xml']),
+            call(['nmap', 'MockSubnet', '-oX', 'core/outputs/port_scanMockTime.xml'], stderr=-3, stdout=-3),
             call().wait()
         ]
         for c in expected_calls:

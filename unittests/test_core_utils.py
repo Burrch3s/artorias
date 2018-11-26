@@ -79,11 +79,23 @@ class TestCoreUtils(unittest.TestCase):
         self.assertEquals(res, None)
         self.assertEquals(mock_open.call_count, 2)
 
+    @patch('builtins.open')
+    @patch('core.utils.loads')
+    @patch('core.utils.zap_spider_auth')
+    @patch('core.utils.zap_spider')
+    @patch('core.utils.start_zap')
     @patch('core.utils.nikto_scan_auth')
-    @patch('core.utils.skipfish_scan')
     @patch('core.utils.nikto_scan')
     @patch('core.utils.xml2json')
-    def test_web_scan(self, mock_xml, mock_nikto, mock_skip, mock_nikto_auth):
+    def test_web_scan(self,
+                      mock_xml,
+                      mock_nikto,
+                      mock_nikto_auth,
+                      mock_start,
+                      mock_spider,
+                      mock_spider_auth,
+                      mock_loads,
+                      mock_open):
         host = MagicMock()
         host.get_services.return_value = [
             {
@@ -101,8 +113,7 @@ class TestCoreUtils(unittest.TestCase):
 
         drive_web_scan(host, False)
         expected_calls = [
-            call(mock_nikto()),
-            call(mock_skip())
+            call(mock_nikto())
         ]
         for c in expected_calls:
             self.assertIn(c, mock_xml.mock_calls)
