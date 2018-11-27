@@ -162,7 +162,7 @@ def zap_spider(target: Host, port: str) -> str:
     zap = ZAPv2()
 
     if port == '443':
-        url = "https:{}".format(str(target))
+        url = "https://{}".format(str(target))
     else:
         url = "http://{}".format(str(target))
 
@@ -198,7 +198,7 @@ def zap_spider_auth(target: Host, port: str, user: str, passwd: str) -> str:
         Zap spider scan with auth.
     """
     if port == '443':
-        url = "https:{}".format(str(target))
+        url = "https://{}".format(str(target))
     else:
         url = "http://{}".format(str(target))
 
