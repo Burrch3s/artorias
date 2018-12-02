@@ -124,3 +124,31 @@ class TestCoreUtils(unittest.TestCase):
         ]
         for c in expected_calls:
             self.assertIn(c, mock_xml.mock_calls)
+
+    @patch('core.utils.loads')
+    @patch('core.utils.error')
+    @patch('builtins.open')
+    @patch('core.utils.hydra_scan')
+    @patch('core.utils.debug')
+    def test_auth_scan(self, mock_debug, mock_hydra, mock_open, mock_error, mock_loads):
+        host = MagicMock()
+        host.get_services.return_value = [{'id': '8080'}]
+
+        # Test with no auth ports to test
+        ret = drive_auth_scan(host)
+        self.assertEquals(ret, True)
+        mock_hydra.assert_not_called()
+
+        # Test with port to test
+        host.get_services.return_value = [{'id': '22'}]
+        loads.return_value = {'results': [{'login': 'mockuser', 'password': 'mockpw'}]}
+
+        ret = drive_auth_scan(host)
+        mock_hydra.assert_called_with(host, '22', 'ssh')
+        self.assertNotEquals(host.get_services, {})
+
+        # Test with exception ocurring
+        mock_loads.side_effect = IOError
+
+        ret = drive_auth_scan(host)
+        self.assertEquals(ret, False)
