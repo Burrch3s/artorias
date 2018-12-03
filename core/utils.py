@@ -105,13 +105,11 @@ def drive_auth_scan(host: Host) -> bool:
             debug("{} {}".format(port, port['id']))
             fname = hydra_scan(host, port['id'], hydra_ports[port['id']])
             try:
-                print('wtf')
                 with open(fname) as f:
                     creds = loads(f.read())
 
                 user = creds['results'][0]['login']
                 pw = creds['results'][0]['password']
-                print('ok got through user pw')
                 host.set_credentials({'user': user, 'passwd': pw})
             except Exception as e:
                 error("Error occurred: {}. Unable to get credentials.".format(e))
