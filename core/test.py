@@ -42,7 +42,8 @@ def handle_test(args: Namespace) -> bool:
         host.set_services(get_services(host)['ports'])
 
         debug(host.get_services())
-        debug(host.has_auth_surface())
+        debug("HAS AUTH: {}".format(host.has_auth_surface()))
+        debug("HAS WEB: {}".format(host.has_web_interface()))
         if host.has_auth_surface() and not (args.user and args.passwd):
             low("Host {} has interface for brute forcing creds, beginning scan.".format(host))
             login_found = drive_auth_scan(host)
@@ -55,7 +56,7 @@ def handle_test(args: Namespace) -> bool:
             low("Host {} has a web interface, beginning scan.".format(host))
             drive_web_scan(host, login_found)
 
-        debug("{} {} {} {} {}".format(
+        debug("IP: {} Ports: {} Auth: {} Nikto Results{} \nZap Results: {}".format(
             str(host), host.get_services(), host.get_credentials(),
             host.get_nikto_result().get_results(), host.get_zap_result().get_results()))
 

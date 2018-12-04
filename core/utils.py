@@ -44,7 +44,7 @@ def get_services(host: str) -> dict:
     return port_info
 
 
-@retry(stop_max_attempt_number=20, wait_fixed=1000)
+@retry(stop_max_attempt_number=60, wait_fixed=1000)
 def wait_for_zap():
     """
     Wait until the python api is able to interact with the zaproxy application.
