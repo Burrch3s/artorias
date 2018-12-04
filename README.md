@@ -1,32 +1,33 @@
-# Artorias IoT Scanner
+# Artorias IoT Security Testing Framework
 
 
-### Does scanner things.. like:
-
-
-#### Enumerate hosts on network
+####  Test specific targets, or subnet of targets
 
 -Identify OS Type
--Filter out IoT Hosts from others
+-Services provided
 
 #### Identify Vulnerabilities (Black Box)
 
--Identify any stupid ports open
+-Identify open ports
 -Identify plaintext traffic to/from device
 -Drive IoT scanners
--Maybe use some Metasploit modules?
 -Try Cracking loggin for weak passwords
+-Test webinterface, if provided
+
+
+## Future ideas
 
 #### Identify Vulnerabilities (White Box)
 
 -Use given credentials on hosts to loggin
 -Perform basic checks (maybe try using Nessus?)
 
-#### Compile Results
+#### Web Front End
+
+-May not be possible in timeframe wanted, but eh let's try
+
+#### Compile and Rank Results
 
 -Take everything that is listed above and provide meaningful feedback
 -Consult NIST, OWASP and other guidelines in attempt to rank findings
 
-#### Web Front End
-
--May not be possible in timeframe wanted, but eh let's try
