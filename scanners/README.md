@@ -20,7 +20,7 @@ for basic default passwords to these web interfaces and will report upon it.
 I5: Privacy Concerns. If I2 or I1 discovered, can easily bleed into affecting
 privacy concerns
 
-### Skipfish
+### Skipfish CURRENTLY DEPRECATED
 Scanner to assess WebApplications that could be present.
 
 ##### Helps Test OWASP Component(s):
@@ -31,7 +31,7 @@ for basic default passwords to these web interfaces and will report upon it.
 I5: Privacy Concerns. If I2 or I1 discovered, can easily bleed into affecting
 privacy concerns
 
-### testssl.sh
+### testssl.sh CURRENTLY UNUSED
 Scanner to identify cipher suites used for transport encryption
 
 ##### Helps Test OWASP Component(s):
@@ -39,8 +39,17 @@ I4: Lac of Transport Encryption. If ports utilizing web services found, will
 scan them for cipher suite offered for traffic.
 I5: Privacy Concerns. Issues found with I4 can easily lead to privacy concerns
 
-### OWASP-Nettacker
-Scanner that I have to check out more.. seems to do a lot lol
+### Hydra
+Brute force scanner for authentication on specified ports.
+
+##### Help Test OWASP Component(s):
+I2: Ports that are able to be tested by brute forcing the credentials will prove
+that default credentials are weak to dictionary attacks. Can impact I1 if admin
+parts of website were "secured" with weak passwords, can also leak into I5 and I3.
+
+### OWASP-Nettacker CURRENTLY UNUSED
+Scanner that does a myriad of things, but I am still exploring it's correct
+application to the framework.
 
 ##### Helps Test OWASP Component(s):
 Update later
