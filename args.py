@@ -20,6 +20,8 @@ def parse_cmd() -> argparse.Namespace:
         'testSubnet': 'Instead of individual targets, specify network to identify hosts on.',
         'testUser': 'Username to use for authenticating with services. Must be supplied with password.',
         'testPass': 'Password to use for authticating with services. Must be supplied with username.',
+        'testOutput': 'Log file to output logging information to. Default is scanner.log',
+        'testLog': 'Lowest log level to display. Set to debug to output debug messages to file.',
         'service': "Start WebInterface Service to show/represent results"
     }
     # TODO remove later
@@ -76,5 +78,18 @@ def parse_cmd() -> argparse.Namespace:
         type=str,
         default=None,
         help=msg['testPass'])
+    test.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        default="scanner.log",
+        help=msg['testOutput'])
+    test.add_argument(
+        "-l",
+        "--log_level",
+        type=str,
+        default="info",
+        choices=["info", "debug", "warning", "error"],
+        help=msg['testLog'])
 
     return parser.parse_args()

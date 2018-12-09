@@ -4,6 +4,7 @@ Basically, functions that I want because white on black wall o' text
 is not always ideal
 """
 
+import logging
 from colors import color
 from datetime import datetime
 
@@ -37,42 +38,48 @@ def low(text: str) -> None:
     """
     Print out a low priority message to the user
     """
-    time = datetime.now().strftime("%H:%M.%S")
+    time = datetime.now().strftime("%m/%d %H:%M.%S")
     msg = "[***] {}:".format(time)
     add_color_first(msg_color=msg, msg_no_color=text, new_style='bold')
+    logging.info("[{}]: {}".format(time, text))
 
 def warning(text: str) -> None:
     """
     Print out a warning message to the user
     """
-    time = datetime.now().strftime("%H:%M.%S")
+    time = datetime.now().strftime("%m/%d %H:%M.%S")
     msg = "[***] {}:".format(time)
     add_color_first(msg_color=msg, msg_no_color=text,
                     new_color='yellow', new_style='bold')
+    logging.warning("[{}]: {}".format(time, text))
 
 def error(text: str) -> None:
     """
     Print out a error message to the user
     """
-    time = datetime.now().strftime("%H:%M.%S")
+    time = datetime.now().strftime("%m/%d %H:%M.%S")
     msg = "[***] {}:".format(time)
     add_color_first(msg_color=msg, msg_no_color=text,
                     new_color=196, new_style='bold')
+    logging.error("[{}]: {}".format(time, text))
 
 def success(text: str) -> None:
     """
     Print out a debug message to the user
     """
-    time = datetime.now().strftime("%H:%M.%S")
+    time = datetime.now().strftime("%m/%d %H:%M.%S")
     msg = "[***] {}:".format(time)
     add_color_first(msg_color=msg, msg_no_color=text,
                     new_color='green', new_style='bold')
+    logging.info("[{}]: {}".format(time, text))
 
 def debug(text: str) -> None:
     """
     Print out a debug message to the user
     """
-    time = datetime.now().strftime("%H:%M.%S")
+    time = datetime.now().strftime("%m/%d %H:%M.%S")
     msg = "[***] {}:".format(time)
     add_color_first(msg_color=msg, msg_no_color=text,
                     new_color=51, new_style='bold')
+    logging.debug("[{}]: {}".format(time, text))
+
