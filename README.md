@@ -1,5 +1,5 @@
 # Artorias IoT Security Testing Framework
-
+[![Build Status](https://travis-ci.com/Burrch3s/artorias.svg?branch=master)](https://travis-ci.com/Burrch3s/artorias)
 
 ####  Test specific targets, or subnet of targets
 
