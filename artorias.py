@@ -10,9 +10,10 @@ def main() -> int:
     """
         Call parse_cmd and hand off execution accordingly
     """
-    logging.basicConfig(filename='artorias.log', level=logging.INFO)
-    logging.info('starting')
     arguments = parse_cmd()
+
+    log_level = getattr(logging, arguments.log_level.upper())
+    logging.basicConfig(filename=arguments.output, level=log_level)
     cmd = arguments.command
     if cmd == 'test':
         ret = handle_test(arguments)
