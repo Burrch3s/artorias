@@ -10,12 +10,8 @@ deploy:
     on:
         branch: master
 
-jobs:
-    include:
-        - stage: install
-          install: pip install -r requirements.txt
-          stage: unittests
-          script: green
-          stage: linting
-          script: 
+install:
+    - pip install -r requirements.txt
 
+script:
+    - green
