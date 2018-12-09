@@ -5,4 +5,4 @@ requests
 xmltodict
 python-owasp-zap-v2.4
 retrying
-coverage-badge
+coveralls
