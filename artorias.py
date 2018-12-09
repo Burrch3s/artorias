@@ -2,6 +2,7 @@
 
 """Artorias main file"""
 
+import logging
 from args import parse_cmd
 from core.test import handle_test
 
@@ -9,6 +10,8 @@ def main() -> int:
     """
         Call parse_cmd and hand off execution accordingly
     """
+    logging.basicConfig(filename='artorias.log', level=logging.INFO)
+    logging.info('starting')
     arguments = parse_cmd()
     cmd = arguments.command
     if cmd == 'test':

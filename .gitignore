@@ -5,6 +5,7 @@
 *.sw[op]
 *.coverage
 *.xml
+*.log
 
 # Exclude commiting scanner binaries and sources
 scanners/binaries/*
