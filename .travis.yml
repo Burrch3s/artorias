@@ -1,0 +1,21 @@
+language: python
+python:
+    - "3.5"
+
+deploy:
+    provider: pages
+    skip-cleanup: true
+    keep-history: true
+    github-token: $GITHUB_TOKEN
+    on:
+        branch: master
+
+jobs:
+    include:
+        - stage: install
+          install: pip install -r requirements.txt
+          stage: unittests
+          script: green
+          stage: linting
+          script: 
+

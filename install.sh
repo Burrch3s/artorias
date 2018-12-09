@@ -1,14 +1,5 @@
 #!/bin/bash
 
-function checks() {
-    if [[ $EUID -ne 0 ]];
-    then
-        # Eh, only for pip installing and adding to path..
-        echo "[X] Script needs to run as root!"
-        exit 1
-    fi
-}
-
 function pip_install() {
     echo "[**] Installing python packages.."
     pip3 install -r requirements.txt
@@ -20,9 +11,6 @@ function pip_install() {
         echo "  with python3.5 and higher"
     fi
 }
-
-# run as root can be removed if in a virtualenv
-checks
 
 status=$(which pip3)
 if [[ $status ]];
