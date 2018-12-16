@@ -8,11 +8,11 @@ class Host():
         and methods.
     """
 
-    def __init__(self, ip=''):
+    def __init__(self, ip: str) -> None:
 
         self._ip = ip
 
-        self._services = {}
+        self._services = None
 
         self._open_ports = []
 
@@ -22,13 +22,13 @@ class Host():
 
         self._credentials = {}
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self._ip
 
     def get_ip(self) -> str:
         return self._ip
 
-    def get_services(self) -> dict:
+    def get_services(self) -> Results:
         return self._services
 
     def get_nikto_result(self) -> Results:
@@ -43,7 +43,7 @@ class Host():
     def set_ip(self, ip: str) -> None:
         self._ip = ip
 
-    def set_services(self, services: dict) -> None:
+    def set_services(self, services: list) -> None:
         self._services = services
 
     def set_nikto_result(self, result: Results) -> None:
@@ -70,7 +70,9 @@ class Host():
         credentials.
         """
         auth = ['80', '443', '21', '22', '23']
+        print(self._services)
         for service in self._services:
+            print(service)
             if service['id'] in auth:
                 return True
         return False

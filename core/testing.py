@@ -1,9 +1,11 @@
 """The beef of Artorias testing code"""
 
 from argparse import Namespace
+# Implement init scans function
 from core.utils import *
 from core.host import Host
 from log import *
+from core.scans.port_scan import PortScan
 
 def handle_args(args: Namespace) -> list:
     """
@@ -39,7 +41,15 @@ def handle_test(args: Namespace) -> bool:
     # TODO research implementing Threads for this
     for host in hosts:
         low("Getting services for target {}".format(str(host)))
-        host.set_services(get_services(host)['ports'])
+        x = PortScan(host)
+        if x.requirements_met:
+            x.run_scan()
+            wow = x.process_results()
+            host.set_services(wow.get_results()['ports'])
+            debug(wow.get_results())
+        else:
+            low('reqs not met??')
+        #host.set_services(get_services(host)['ports'])
 
         debug(host.get_services())
         debug("HAS AUTH: {}".format(host.has_auth_surface()))
@@ -55,9 +65,8 @@ def handle_test(args: Namespace) -> bool:
         if host.has_web_interface():
             low("Host {} has a web interface, beginning scan.".format(host))
             drive_web_scan(host, login_found)
-
-        debug("IP: {} Ports: {} Auth: {} Nikto Results{} \nZap Results: {}".format(
-            str(host), host.get_services(), host.get_credentials(),
-            host.get_nikto_result().get_results(), host.get_zap_result().get_results()))
+            debug("IP: {} Ports: {} Auth: {} Nikto Results{} \nZap Results: {}".format(
+                str(host), host.get_services(), host.get_credentials(),
+                host.get_nikto_result().get_results(), host.get_zap_result().get_results()))
 
     return True

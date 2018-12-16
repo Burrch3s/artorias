@@ -6,7 +6,7 @@ from retrying import retry
 from subprocess import Popen, DEVNULL
 from core.host import Host
 from core.result import Results
-from core.scans import *
+from core.scan import *
 from log import *
 from zapv2 import ZAPv2
 
