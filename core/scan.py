@@ -12,16 +12,13 @@ class Scan:
     Parent class representing a scan or test.
     """
 
-    def __init__(self, targets: list):
+    def __init__(self, target: str):
 
         # Remote host to scan
-        self.target = targets
+        self.target = target
 
         # Filename of scanner output
         self.output_name = ''
-
-        # Any scanner specific configurations to be set
-        self.config = {}
 
     def requirements_met(self) -> bool:
         """

@@ -1,4 +1,4 @@
-# Util Functions used within the core directory
+"""Util Functions used within the core directory"""
 
 from xmltodict import parse
 from json import dumps, loads
@@ -22,27 +22,6 @@ def get_hosts(subnet: str) -> list:
         hosts.append(Host(device['address']['@addr']))
 
     return hosts
-
-def get_services(host: str) -> dict:
-    """
-        Perform nmap service scan and return a list of services/ports listening
-    """
-    scan_info = xml2json(port_scan(host))
-    ports = scan_info['nmaprun']['host']['ports']['port']
-    port_info = {
-        'ports': []
-    }
-
-    for port in ports:
-        tmp = {}
-        tmp['id'] = port['@portid']
-        tmp['name'] = port['service']['@name']
-        tmp['state'] = port['state']['@state']
-        port_info['ports'].append(tmp)
-
-    debug("port_info {}".format(port_info))
-    return port_info
-
 
 @retry(stop_max_attempt_number=60, wait_fixed=1000)
 def wait_for_zap():
@@ -77,6 +56,8 @@ def drive_web_scan(host: Host, auth: bool) -> None:
             if not auth:
                 host.set_nikto_result(Results('nikto', xml2json(nikto_scan(host, port['id']))))
                 host.set_zap_result(Results('zap_spider', loads(zap_spider(host, port['id']))))
+
+
             else:
                 creds = host.get_credentials()
                 host.set_nikto_result(

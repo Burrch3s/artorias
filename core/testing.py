@@ -39,14 +39,15 @@ def handle_test(args: Namespace) -> bool:
     hosts = handle_args(args)
 
     # TODO research implementing Threads for this
+    # Port scan
+    # Auth scan
+    # Threads >> point to func that inits every scan and runs them
     for host in hosts:
         low("Getting services for target {}".format(str(host)))
         x = PortScan(host)
         if x.requirements_met:
             x.run_scan()
-            wow = x.process_results()
-            host.set_services(wow.get_results()['ports'])
-            debug(wow.get_results())
+            host.set_services(x.process_results())
         else:
             low('reqs not met??')
         #host.set_services(get_services(host)['ports'])

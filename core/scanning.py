@@ -25,59 +25,6 @@ def host_scan(subnet: str) -> str:
     low("Host scan completed.")
     return fname
 
-def port_scan(target: str) -> str:
-    """
-        Drive nmap port scan, save output to a file and return output file name.
-        No fancy args here, just default port scan for now.
-    """
-    # File name to save output to
-    fname = '{}/port_scan{}.xml'.format(SCAN_OUTPUT_DIR, datetime.now().strftime('%m-%d_%H-%M-%S'))
-
-    # Drive host scan and output to file
-    nmap = Popen(['nmap', str(target), '-oX', fname], stdout=DEVNULL, stderr=DEVNULL)
-    low("Waiting for port scan to complete.")
-
-    nmap.wait()
-
-    low("Port scan completed.")
-    return fname
-
-def nikto_scan(target: Host, port: str) -> str:
-    """
-        Drive Nikto scan against a specified port, save output to a file and return
-        output file name.
-    """
-    # File name to save output to
-    fname = '{}/nikto_scan{}_{}.xml'.format(SCAN_OUTPUT_DIR, port, datetime.now().strftime(
-        '%m-%d_%H-%M-%S'))
-
-    # This scanner can be helpful with stdout since it doesnt flood logs and can
-    # be polled for progress of the scan
-    nikto = Popen(['nikto', '-host', str(target), '-port', port, '-output', fname])
-    low('Waiting for Nikto scan on port {} to complete'.format(port))
-
-    nikto.wait()
-
-    low('Nikto scan completed.')
-    return fname
-
-def nikto_scan_auth(target: Host, port: str, user: str, pw: str) -> str:
-    """
-        Nikto scan with auth supplied, saves output to a file and returns the file name
-    """
-    # File name to save output to
-    fname = '{}/nikto_scan{}_{}.xml'.format(SCAN_OUTPUT_DIR, port, datetime.now().strftime(
-        '%m-%d_%H-%M-%S'))
-
-    nikto = Popen(['nikto', '-host', str(target), '-port', port, '-id', '{}:{}'.format(user, pw),
-                   '-output', fname])
-    low('Waiting for Nikto with auth scan on port {} to complete.'.format(port))
-
-    nikto.wait()
-
-    low('Nikto scan with auth completed.')
-    return fname
-
 def skipfish_scan(target: Host, port: str) -> str:
     """
         Drive Skipfish scan against a specified port, save output to a file and return
@@ -93,28 +40,6 @@ def skipfish_scan(target: Host, port: str) -> str:
     skipfish.wait()
 
     low('Skipfish scan completed.')
-    return fname
-
-def hydra_scan(target: Host, port: str, service: str) -> str:
-    """
-        Hydra scan to retrieve brute force credentials
-    """
-    # File name to save output to
-    fname = '{}/hydra_scan{}_{}.json'.format(SCAN_OUTPUT_DIR, service, datetime.now().strftime(
-        '%m-%d_%H-%M-%S'))
-
-    try:
-        warning("Brute forcing credentials can take a long time, CTRL-C once to abort.")
-        hydra = Popen([
-            'hydra', '-L', WORD_LIST, '-P', WORD_LIST, '-u', '-f', '-o', fname,
-            "-b", "json", "{}://{}".format(service, str(target))])
-
-        low('Waiting for hydra scan on {} to complete.'.format(service))
-        hydra.wait()
-    except KeyboardInterrupt:
-        low("Hydra scan aborted. Other scans may not be as effective without credentials.")
-
-    low('Hydra scan completed.')
     return fname
 
 def zap_setup_context(target: Host, port: str, user: str, passwd: str) -> tuple:
