@@ -1,7 +1,16 @@
+dist: trusty
 language: python
+
 cache: pip
+cache:
+    directories:
+        - '$HOME/.sonar/cache'
 python:
     - "3.5"
+
+addons:
+    sonarcloud:
+        organization: "burrch3s-github"
 
 install:
     - pip install -r requirements.txt
@@ -9,3 +18,4 @@ install:
 script:
     - green
     - coveralls
+    - sonar-scanner
