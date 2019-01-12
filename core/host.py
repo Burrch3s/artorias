@@ -70,9 +70,7 @@ class Host():
         credentials.
         """
         auth = ['80', '443', '21', '22', '23']
-        print(self._services)
         for service in self._services:
-            print(service)
             if service['id'] in auth:
                 return True
         return False

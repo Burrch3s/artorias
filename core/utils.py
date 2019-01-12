@@ -1,5 +1,6 @@
 """Util Functions used within the core directory"""
 
+from os import listdir
 from xmltodict import parse
 from json import dumps, loads
 from retrying import retry
@@ -122,3 +123,15 @@ def xml2json(sfile: str) -> dict:
     except IOError:
         error("IO Error reading {}".format(sfile))
         return None
+
+def get_all_scans() -> list:
+    """
+    Get names of Python files in core/scans directory and drop the file suffix
+    """
+    return [scan.split('.')[0] for scan in listdir('./core/scans') if scan.endswith('.py')]
+
+def file_to_class_name(f_name: str) -> str:
+    """
+    Take the file name of a scan and return the name of it as a class: snake to camel case
+    """
+    return "".join(word.title() for word in f_name.split('_'))

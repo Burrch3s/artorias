@@ -1,19 +1,28 @@
-"""Default template of a scan"""
+"""Hydra scan to test host for generic credentials"""
 
 # Generic imports to utilize
 from datetime import datetime
 from subprocess import Popen, DEVNULL
+from json import loads
 from core.host import Host
 from core.result import Results
 from core.scan import Scan
 from core.utils import xml2json
-from log import low
-from settings import SCAN_OUTPUT_DIR, DATE_ARGS
+from log import low, debug, warning
+from settings import SCAN_OUTPUT_DIR, DATE_ARGS, WORD_LIST
 
 class HydraScan(Scan):
 
     def __init__(self, target: Host) -> None:
         super().__init__(target)
+
+        self.hydra_ports = {
+            '80': 'http',
+            '443': 'https',
+            '21': 'ftp',
+            '22': 'ssh',
+            '23': 'telnet'
+        }
 
     def requirements_met(self) -> bool:
         """
@@ -26,15 +35,22 @@ class HydraScan(Scan):
         Perform actual scan. It is absolutely ok to implement other functions to help
         run_scan and reduce complexity.
         """
+        # TODO consider auth scan over every applicable port
+        for port in self.target.get_services():
+            if port['id'] in self.hydra_ports:
+                debug("{} {}".format(port, port['id']))
+                service = port
+                break
+
         # File name to save output to
-        fname = '{}/hydra_scan{}_{}.json'.format(SCAN_OUTPUT_DIR, service, datetime.now().strftime(
+        self.output_name = '{}/hydra_scan{}_{}.json'.format(SCAN_OUTPUT_DIR, service, datetime.now().strftime(
             '%m-%d_%H-%M-%S'))
 
         try:
             warning("Brute forcing credentials can take a long time, CTRL-C once to abort.")
             hydra = Popen([
-                'hydra', '-L', WORD_LIST, '-P', WORD_LIST, '-u', '-f', '-o', fname,
-                "-b", "json", "{}://{}".format(service, str(target))])
+                'hydra', '-L', WORD_LIST, '-P', WORD_LIST, '-u', '-f', '-o', self.output_name,
+                "-b", "json", "{}://{}".format(service, str(self.target))])
 
             low('Waiting for hydra scan on {} to complete.'.format(service))
             hydra.wait()
@@ -42,10 +58,12 @@ class HydraScan(Scan):
             low("Hydra scan aborted. Other scans may not be as effective without credentials.")
 
         low('Hydra scan completed.')
-        return fname
 
     def process_results(self) -> Results:
         """
         Strip out unneeded information and create Results object for scan
         """
-        return None
+        with open(self.output_name) as f:
+            creds = f.read()
+
+        return Results('hydra', loads(creds))
