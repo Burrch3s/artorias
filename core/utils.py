@@ -8,7 +8,7 @@ from retrying import retry
 from subprocess import Popen, DEVNULL
 from core.host import Host
 from core.result import Results
-from core.scan import *
+from core.scanning import *
 from log import *
 from zapv2 import ZAPv2
 
@@ -56,7 +56,7 @@ def zap_setup_context(target: Host, port: str, user: str, passwd: str) -> tuple:
     zap = ZAPv2()
 
     if port == '443':
-        url = "https:{}".format(str(target))
+        url = "https://{}".format(str(target))
     else:
         url = "http://{}".format(str(target))
 

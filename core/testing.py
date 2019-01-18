@@ -16,11 +16,9 @@ def handle_args(args: Namespace) -> list:
     """
     # If no targets provided, assume were finding them on network.
     # Once we have targets, if no test given, port/service scan them.
-    subnet = verify_subnet(args.subnet)
-
     if not args.target:
         low("Target not supplied, running host scan.")
-        hosts = get_hosts(subnet)
+        hosts = get_hosts(verify_subnet(args.subnet))
     else:
         low("Target supplied: {}".format(args.target))
         hosts = [Host(host) for host in args.target]

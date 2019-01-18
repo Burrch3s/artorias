@@ -1,4 +1,4 @@
 verbose = 2
 logging = True
 run-coverage = True
-omit-patterns = log.py
+omit-patterns = log.py,core/scans/*.*
