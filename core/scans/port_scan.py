@@ -30,7 +30,7 @@ class PortScan(Scan):
         nmap = Popen(['nmap', str(self.target), '-oX', self.output_name],
                      stdout=DEVNULL, stderr=DEVNULL)
 
-        low("Waiting for port scan on {} to compolete".format(str(self.target)))
+        low("Waiting for port scan on {} to complete".format(str(self.target)))
         nmap.wait()
         low("Port scan on {} completed.".format(str(self.target)))
 

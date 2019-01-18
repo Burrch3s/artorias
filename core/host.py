@@ -40,6 +40,9 @@ class Host():
     def get_credentials(self) -> dict:
         return self._credentials
 
+    def get_open_ports(self) -> list:
+        return self._open_ports
+
     def set_ip(self, ip: str) -> None:
         self._ip = ip
 
@@ -55,11 +58,14 @@ class Host():
     def set_credentials(self, creds: dict) -> None:
         self._credentials.update(creds)
 
+    def set_open_ports(self, ports: list) -> None:
+        self._open_ports = ports
+
     def has_web_interface(self) -> bool:
         """
         Determine if host has a port that is commonly known as a web interface
         """
-        for service in self._services:
+        for service in self._services.get_results()['ports']:
             if service['id'] in ('80', '443', '8080'):
                 return True
         return False
@@ -70,7 +76,7 @@ class Host():
         credentials.
         """
         auth = ['80', '443', '21', '22', '23']
-        for service in self._services:
+        for service in self._services.get_results()['ports']:
             if service['id'] in auth:
                 return True
         return False

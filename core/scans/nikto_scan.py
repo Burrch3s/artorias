@@ -21,12 +21,14 @@ class NiktoScan(Scan):
         """
         return self.target.has_web_interface()
 
-    def set_config(self, *args: list, **kwargs: dict) -> None:
-        if 'port' in kwargs:
-            self.port = kwargs['port']
-        if 'user' in kwargs and 'password' in kwargs:
-            self.user = kwargs['user']
-            self.password = kwargs['password']
+    def set_config(self) -> None:
+        self.user = self.target.get_credentials()['user']
+        self.password = self.target.get_credentials()['passwd']
+
+        for temp in self.target.get_open_ports():
+            if temp in ('80', '8080', '443'):
+                self.port = temp
+                break
 
     def run_scan(self) -> None:
         """

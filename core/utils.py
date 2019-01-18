@@ -3,6 +3,7 @@
 from os import listdir
 from xmltodict import parse
 from json import dumps, loads
+from time import sleep
 from retrying import retry
 from subprocess import Popen, DEVNULL
 from core.host import Host
@@ -39,68 +40,45 @@ def start_zap():
     """
     Start up the Zaproxy application so the python API can communicate with it.
     """
-    low("Starting the zaproxy application.")
-    zap_app = Popen(['zaproxy'], stdout=DEVNULL, stderr=DEVNULL)
-    wait_for_zap()
+    try:
+        zap = ZAPv2()
+        zap.urlopen('http://127.0.0.1')
+    except:
+        low("Starting the zaproxy application.")
+        zap_app = Popen(['zaproxy'], stdout=DEVNULL, stderr=DEVNULL)
+        wait_for_zap()
 
-
-def drive_web_scan(host: Host, auth: bool) -> None:
+def zap_setup_context(target: Host, port: str, user: str, passwd: str) -> tuple:
     """
-    Automate web app scanners against the provided host
+    Creates a context for this scan, adding a new user to that context and sets up
+    the authentication mechanism.
     """
-    common_ports = ['80', '443', '8080']
+    zap = ZAPv2()
 
-    for port in host.get_services():
-        if port['id'] in common_ports:
-            start_zap()
-            # TODO replace with standardized and filtered nikto/skipfish results
-            if not auth:
-                host.set_nikto_result(Results('nikto', xml2json(nikto_scan(host, port['id']))))
-                host.set_zap_result(Results('zap_spider', loads(zap_spider(host, port['id']))))
+    if port == '443':
+        url = "https:{}".format(str(target))
+    else:
+        url = "http://{}".format(str(target))
 
+    low("Creating new context for zap scan.")
+    context_id = zap.context.new_context("ZapScan")
 
-            else:
-                creds = host.get_credentials()
-                host.set_nikto_result(
-                    Results('nikto', xml2json(
-                        nikto_scan_auth(host, port['id'], creds['user'], creds['passwd']))))
-                zap_results = zap_spider_auth(host, port['id'], creds['user'], creds['passwd'])
-                with open(zap_results, 'r') as f:
-                    results = f.read()
+    # Default listening for zap is 8090
+    zap.context.include_in_context("ZapScan", "{}.*".format(str(target)))
+    zap.context.include_in_context("ZapScan", "{}.*".format(url))
+    zap.authentication.set_authentication_method(
+        context_id, 'httpAuthentication', 'hostname={}&realm='.format(str(target)))
 
-                host.set_zap_result(Results('zap_spider', loads(results)))
+    low("Creating user for context.")
+    user_id = zap.users.new_user(context_id, "zapuser")
+    zap.users.set_authentication_credentials(
+        context_id, user_id, "username={}&password={}".format(user, passwd))
+    zap.users.set_user_enabled(context_id, user_id, True)
 
-def drive_auth_scan(host: Host) -> bool:
-    """
-    Automate hydra auth scan against the provided host
-    """
-    hydra_ports = {
-        '80': 'http',
-        '443': 'https',
-        '21': 'ftp',
-        '22': 'ssh',
-        '23': 'telnet'
-    }
+    zap.forcedUser.set_forced_user(context_id, user_id)
+    zap.forcedUser.set_forced_user_mode_enabled(True)
 
-    for port in host.get_services():
-        if port['id'] in hydra_ports:
-            debug("{} {}".format(port, port['id']))
-            fname = hydra_scan(host, port['id'], hydra_ports[port['id']])
-            try:
-                with open(fname) as f:
-                    creds = loads(f.read())
-
-                user = creds['results'][0]['login']
-                pw = creds['results'][0]['password']
-                host.set_credentials({'user': user, 'passwd': pw})
-            except Exception as e:
-                error("Error occurred: {}. Unable to get credentials.".format(e))
-                return False
-
-            return True
-
-    # Didn't find any ports to scan
-    return True
+    return context_id, user_id
 
 def verify_subnet(subnet: str) -> str:
     """

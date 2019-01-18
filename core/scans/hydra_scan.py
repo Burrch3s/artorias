@@ -17,7 +17,7 @@ class HydraScan(Scan):
         super().__init__(target)
 
         self.hydra_ports = {
-            '80': 'http',
+            #'80': 'http',
             '443': 'https',
             '21': 'ftp',
             '22': 'ssh',
@@ -28,31 +28,30 @@ class HydraScan(Scan):
         """
         Checks if a host has a auth interface
         """
-        return self.target.has_auth_interface()
+        return self.target.has_auth_surface()
+
+    def set_config(self) -> None:
+        for temp in self.target.get_services().get_results()['ports']:
+            print(temp)
+            if temp['id'] in self.hydra_ports:
+                self.service = temp['name']
 
     def run_scan(self) -> None:
         """
         Perform actual scan. It is absolutely ok to implement other functions to help
         run_scan and reduce complexity.
         """
-        # TODO consider auth scan over every applicable port
-        for port in self.target.get_services():
-            if port['id'] in self.hydra_ports:
-                debug("{} {}".format(port, port['id']))
-                service = port
-                break
-
         # File name to save output to
-        self.output_name = '{}/hydra_scan{}_{}.json'.format(SCAN_OUTPUT_DIR, service, datetime.now().strftime(
+        self.output_name = '{}/hydra_scan{}_{}.json'.format(SCAN_OUTPUT_DIR, self.service, datetime.now().strftime(
             '%m-%d_%H-%M-%S'))
 
         try:
-            warning("Brute forcing credentials can take a long time, CTRL-C once to abort.")
+            warning("Brute forcing credentials can take a long time, consider running with creds.")
             hydra = Popen([
                 'hydra', '-L', WORD_LIST, '-P', WORD_LIST, '-u', '-f', '-o', self.output_name,
-                "-b", "json", "{}://{}".format(service, str(self.target))])
+                "-b", "json", "{}://{}".format(self.service, str(self.target))])
 
-            low('Waiting for hydra scan on {} to complete.'.format(service))
+            low('Waiting for hydra scan on {} to complete.'.format(self.service))
             hydra.wait()
         except KeyboardInterrupt:
             low("Hydra scan aborted. Other scans may not be as effective without credentials.")

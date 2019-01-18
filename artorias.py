@@ -3,7 +3,7 @@
 """Artorias main file"""
 
 import logging
-from args import parse_cmd
+from core.args import parse_cmd
 from core.testing import handle_test
 
 def main() -> int:
