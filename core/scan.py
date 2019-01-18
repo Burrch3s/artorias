@@ -3,10 +3,6 @@
 from core.result import Results
 from log import low
 
-# x = PortScan(['192.158.0.0', '127.0.0.1'])
-# x.set_config(port=99)
-# list of Hosts or str
-
 class Scan:
     """
     Parent class representing a scan or test.
@@ -27,7 +23,7 @@ class Scan:
         """
         pass
 
-    def set_config(self, *args: list, **kwargs: dict) -> None:
+    def set_config(self) -> None:
         """
         Scanner specific function for settings any paramenters needed to complete the test:
         example would be ports to scan, user names, passwords, etc.

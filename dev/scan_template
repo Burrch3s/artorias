@@ -1,0 +1,35 @@
+"""Default template of a scan"""
+
+# Generic imports to utilize
+from datetime import datetime
+from subprocess import Popen, DEVNULL
+from core.host import Host
+from core.result import Results
+from core.scan import Scan
+from core.utils import xml2json
+from log import low
+from settings import SCAN_OUTPUT_DIR, DATE_ARGS
+
+class $SCAN_NAME(Scan):
+
+    def __init__(self, target: Host) -> None:
+        super().__init__(target)
+
+    def requirements_met(self) -> bool:
+        """
+        Check to be performed if the target meets requirements
+        """
+        return False
+
+    def run_scan(self) -> None:
+        """
+        Perform actual scan. It is absolutely ok to implement other functions to help
+        run_scan and reduce complexity.
+        """
+        pass
+
+    def process_results(self) -> Results:
+        """
+        Strip out unneeded information and create Results object for scan
+        """
+        return None
