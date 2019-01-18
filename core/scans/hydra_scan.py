@@ -16,9 +16,10 @@ class HydraScan(Scan):
     def __init__(self, target: Host) -> None:
         super().__init__(target)
 
+        # TODO need to update these, hydra throws errors about type of requests!
+        #'80': 'http',
+        #'443': 'https',
         self.hydra_ports = {
-            #'80': 'http',
-            '443': 'https',
             '21': 'ftp',
             '22': 'ssh',
             '23': 'telnet'
