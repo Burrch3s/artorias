@@ -22,26 +22,6 @@ class TestCoreUtils(unittest.TestCase):
         ret = get_hosts('MockSubnet')
         self.assertEquals(ret, ['MockHost'])
 
-    @patch('core.utils.xml2json')
-    @patch('core.utils.port_scan')
-    def test_get_services(self, mock_port, mock_xml):
-        mock_xml.return_value = {
-            'nmaprun': {
-                'host': {
-                    'ports': {
-                        'port': [{
-                            '@portid': '22',
-                            'service': {'@name': 'ssh'},
-                            'state': {'@state': 'open'},
-                        }]
-                    }
-                }
-            }
-        }
-
-        ret = get_services('MockHost')
-        self.assertEquals(
-            ret, {'ports': [{'state': 'open', 'id': '22', 'name': 'ssh'}]})
 
     def test_verify_subnet(self):
         # Test with no subnet notation
@@ -79,76 +59,39 @@ class TestCoreUtils(unittest.TestCase):
         self.assertEquals(res, None)
         self.assertEquals(mock_open.call_count, 2)
 
-    @patch('builtins.open')
-    @patch('core.utils.loads')
-    @patch('core.utils.zap_spider_auth')
-    @patch('core.utils.zap_spider')
-    @patch('core.utils.start_zap')
-    @patch('core.utils.nikto_scan_auth')
-    @patch('core.utils.nikto_scan')
-    @patch('core.utils.xml2json')
-    def test_web_scan(self,
-                      mock_xml,
-                      mock_nikto,
-                      mock_nikto_auth,
-                      mock_start,
-                      mock_spider,
-                      mock_spider_auth,
-                      mock_loads,
-                      mock_open):
-        host = MagicMock()
-        host.get_services.return_value = [
-            {
-                'state': 'open',
-                'id': '80',
-                'name': 'MockPort'
-            },
-            {
-                'state': 'open',
-                'id': '22',
-                'name': 'MockPort2'
-            }
-        ]
-        host.get_credentials.return_value = {'user': 'user', 'passwd': 'password'}
+    @patch('core.utils.low')
+    @patch('core.utils.Popen')
+    @patch('core.utils.wait_for_zap')
+    @patch('core.utils.ZAPv2')
+    def start_zap(self, mock_zap, mock_wait, mock_popen, mock_low):
+        # Test starting zap with no exception correctly opens url
+        start_zap()
 
-        drive_web_scan(host, False)
-        expected_calls = [
-            call(mock_nikto())
-        ]
-        for c in expected_calls:
-            self.assertIn(c, mock_xml.mock_calls)
+        mock_low.assert_not_called()
+        mock_popen.assert_not_called()
 
-        drive_web_scan(host, True)
-        expected_calls = [
-            call(mock_nikto_auth('user', 'passwd')),
-        ]
-        for c in expected_calls:
-            self.assertIn(c, mock_xml.mock_calls)
+        # Test when zap not up, correctly start up and wait for zap
+        mock_zap.return_value.urlopen.side_effect = BaseException
 
-    @patch('core.utils.loads')
-    @patch('core.utils.error')
-    @patch('builtins.open')
-    @patch('core.utils.hydra_scan')
-    @patch('core.utils.debug')
-    def test_auth_scan(self, mock_debug, mock_hydra, mock_open, mock_error, mock_loads):
-        host = MagicMock()
-        host.get_services.return_value = [{'id': '8080'}]
+        start_zap()
+        mock_low.assert_called()
+        mock_popen.assert_called()
+        mock_wait.assert_called()
 
-        # Test with no auth ports to test
-        ret = drive_auth_scan(host)
-        self.assertEquals(ret, True)
-        mock_hydra.assert_not_called()
+    @patch('core.utils.low')
+    @patch('core.utils.ZAPv2')
+    def test_zap_setup_context(self, mock_zap, mock_low):
+        # TODO update unittest: include checks on internal func calls
+        # convinience variables
+        con = mock_zap.return_value.context
+        user = mock_zap.return_value.users
+        force = mock_zap.return_value.forcedUser
+        auth = mock_zap.return_value.authentication
 
-        # Test with port to test
-        host.get_services.return_value = [{'id': '22'}]
-        loads.return_value = {'results': [{'login': 'mockuser', 'password': 'mockpw'}]}
+        con.new_context.return_value = 'c_id'
+        user.new_user.return_value = 'u_id'
 
-        ret = drive_auth_scan(host)
-        mock_hydra.assert_called_with(host, '22', 'ssh')
-        self.assertNotEquals(host.get_services, {})
+        c_id, u_id = zap_setup_context('host', '80', 'user', 'pass')
 
-        # Test with exception ocurring
-        mock_loads.side_effect = IOError
-
-        ret = drive_auth_scan(host)
-        self.assertEquals(ret, False)
+        self.assertEquals(c_id, 'c_id')
+        self.assertEquals(u_id, 'u_id')
