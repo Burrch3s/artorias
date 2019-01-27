@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Artorias main file"""
+"""Artorias main file, kicks off the rest of the project"""
 
 import logging
 from core.args import parse_cmd
@@ -12,9 +12,11 @@ def main() -> int:
     """
     arguments = parse_cmd()
 
+    # Convert arg from parser/user_input to proper log levels
     log_level = getattr(logging, arguments.log_level.upper())
     logging.basicConfig(filename=arguments.output, level=log_level)
     cmd = arguments.command
+
     if cmd == 'test':
         ret = handle_test(arguments)
     elif cmd == 'scan':

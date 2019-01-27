@@ -12,7 +12,9 @@ def parse_cmd() -> argparse.Namespace:
         "subparser": "Choose what to do with Artorias",
         'identify': "Identify hosts on specified subnet",
         'scan': "Run a scanner with default args, manually testing on an IoT host with",
-        'scanHostScan': "Nmap host scan: Searches current network for alive hosts",
+        'scanScans': "Scans to run, either singular or a list of them.",
+        'scanPorts': "Ports that the target has to run scans on.",
+        'scanCredentials': "<user>:<password> combintation to use on targets authenticated services.",
         'test': "Run a series of scans, preconfigured to test aspects of an IoT host." \
                 + "The recommended option to using this scanner/framework",
         'testAll': "Run all tests possible",
@@ -22,13 +24,26 @@ def parse_cmd() -> argparse.Namespace:
         'testPass': 'Password to use for authticating with services. Must be supplied with username.',
         'testOutput': 'Log file to output logging information to. Default is scanner.log',
         'testLog': 'Lowest log level to display. Set to debug to output debug messages to file.',
-        'service': "Start WebInterface Service to show/represent results"
+
     }
-    # TODO remove later
-    print('Right now only test argument is implemented. Args in test should work.')
-    print('No args supplied uses host scan to gather hosts, or use target arg.')
 
     parser = argparse.ArgumentParser()
+
+    # Command agnostic arguments
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        default="scanner.log",
+        help=msg['testOutput'])
+    parser.add_argument(
+        "-l",
+        "--log_level",
+        type=str,
+        default="info",
+        choices=["info", "debug", "warning", "error"],
+        help=msg['testLog'])
+
     subparser = parser.add_subparsers(
         dest="command",
         help=msg['subparser'])
@@ -39,9 +54,21 @@ def parse_cmd() -> argparse.Namespace:
         "scan",
         help=msg['scan'])
     scan.add_argument(
-        "--hostScan",
-        action="store_true",
-        help=msg['scanHostScan'])
+        "-s",
+        "--scans",
+        type=list,
+        choices=['nikto', 'hydra', 'zap-spider'],
+        help=msg['scanScans'])
+    scan.add_argument(
+        "-p",
+        "--ports",
+        type=list,
+        help=msg['scanPorts'])
+    scan.add_argument(
+        "-c",
+        "--credentials",
+        type=str,
+        help=msg['scanCredentials'])
 
     # artorias test ${args}
     test = subparser.add_parser(
@@ -78,18 +105,5 @@ def parse_cmd() -> argparse.Namespace:
         type=str,
         default=None,
         help=msg['testPass'])
-    test.add_argument(
-        "-o",
-        "--output",
-        type=str,
-        default="scanner.log",
-        help=msg['testOutput'])
-    test.add_argument(
-        "-l",
-        "--log_level",
-        type=str,
-        default="info",
-        choices=["info", "debug", "warning", "error"],
-        help=msg['testLog'])
 
     return parser.parse_args()
