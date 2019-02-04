@@ -8,7 +8,7 @@ from core.result import Results
 from core.scan import Scan
 from core.utils import xml2json
 from log import low
-from settings import SCAN_OUTPUT_DIR, DATE_ARGS
+from settings import SCAN_OUTPUT_DIR, DATE_ARGS, WEB_PORTS
 
 class NiktoScan(Scan):
 
@@ -22,11 +22,16 @@ class NiktoScan(Scan):
         return self.target.has_web_interface()
 
     def set_config(self) -> None:
-        self.user = self.target.get_credentials()['user']
-        self.password = self.target.get_credentials()['passwd']
+        try:
+            self.user = self.target.get_credentials()['user']
+            self.password = self.target.get_credentials()['passwd']
+        except KeyError:
+            low("User/Pass not supplied for nikto scan, running without credentials.")
+            self.user = ""
+            self.password = ""
 
         for temp in self.target.get_open_ports():
-            if temp in ('80', '8080', '443'):
+            if temp in WEB_PORTS:
                 self.port = temp
                 break
 

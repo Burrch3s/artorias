@@ -8,8 +8,8 @@ from core.host import Host
 from core.result import Results
 from core.scan import Scan
 from core.utils import xml2json
-from log import low, debug, warning
-from settings import SCAN_OUTPUT_DIR, DATE_ARGS, WORD_LIST
+from log import low, warning, error
+from settings import SCAN_OUTPUT_DIR, DATE_ARGS, WORD_LIST, AUTH_PORTS
 
 class HydraScan(Scan):
 
@@ -19,6 +19,7 @@ class HydraScan(Scan):
         # TODO need to update these, hydra throws errors about type of requests!
         #'80': 'http',
         #'443': 'https',
+        # Translate ports to services
         self.hydra_ports = {
             '21': 'ftp',
             '22': 'ssh',
@@ -32,10 +33,16 @@ class HydraScan(Scan):
         return self.target.has_auth_surface()
 
     def set_config(self) -> None:
-        for temp in self.target.get_services().get_results()['ports']:
-            print(temp)
-            if temp['id'] in self.hydra_ports:
-                self.service = temp['name']
+        for temp in self.target.get_open_ports():
+            if temp in self.hydra_ports:
+                port = temp
+                break
+
+        try:
+            self.service = self.hydra_ports[port]
+        except KeyError:
+            error("No port to service translation for {}".format(port))
+            raise
 
     def run_scan(self) -> None:
         """

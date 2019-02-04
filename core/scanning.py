@@ -4,52 +4,47 @@ shell for that
 TODO remove scans
 """
 
+from argparse import Namespace
 from datetime import datetime
-from time import sleep
-from json import dumps, loads
 from subprocess import Popen, DEVNULL
-from zapv2 import ZAPv2
 from core.host import Host
-from log import *
+from core.utils import file_to_class_name, run_scans
+from log import low, warning, error
 from settings import SCAN_OUTPUT_DIR, WORD_LIST
 
-def host_scan(subnet: str) -> str:
+def handle_scan(args: Namespace) -> bool:
     """
-        Drive nmap host scan, save output to a file and return output file name.
+    Handle execution of scan arg, running one or more scans from user input.
     """
-    # File name to save output to
-    fname = '{}/host_scan{}.xml'.format(SCAN_OUTPUT_DIR, datetime.now().strftime('%m-%d_%H-%M-%S'))
+    hosts = handle_args(args)
 
-    # Drive host scan and output to file
-    nmap = Popen(['nmap', subnet, '-sn', '-oX', fname], stdout=DEVNULL, stderr=DEVNULL)
-    low("Waiting for host scan to complete.")
+    # For each scan, force scan to run. Reason for force is that we don't want a scan to not run
+    # from users specified ports not belonging in the WEB/AUTH variables for some scans.
+    for host in hosts:
+        run_scans(host, args.scans, True)
 
-    nmap.wait()
+    return True
 
-    low("Host scan completed.")
-    return fname
-
-def skipfish_scan(target: Host, port: str) -> str:
+def handle_args(args: Namespace) -> list:
     """
-        DEPRECATED: TODO re-evaulate it's worth, then potentially create Scan
-        Drive Skipfish scan against a specified port, save output to a file and return
-        outpu file name.
+    Parse arguments for scan and configure host objects. The scan arg is more demanding about
+    the information it requires before it will run tests, and will not attempt to dynamically
+    figure out information about the target before running a scan.
     """
-    # File name to save output to
-    fname = '{}/skipfish_scan{}_{}.xml'.format(SCAN_OUTPUT_DIR, port, datetime.now().strftime(
-        '%m-%d_%H-%M-%S'))
+    low("Target supplied: {}".format(args.target))
+    hosts = [Host(host) for host in args.target]
 
-    skipfish = Popen(['skipfish', '-o', fname, str(target)])
-    low('Waiting for Skipfish scan on port {} to complete.'.format(port))
+    if args.credentials:
+        if len(args.credentials.split(':')) != 2:
+            warning("Credentials should be as supplied <USER>:<PASS>")
+            low("Defaulting to no credentials")
+        else:
+            low("User and Password supplied for scans, {}".format(args.credentials))
+            for host in hosts:
+                host.set_credentials({'user': args.credentials.split(':')[0],
+                                      'passwd': args.credentials.split(':')[1]})
 
-    skipfish.wait()
+    for host in hosts:
+        host.set_open_ports(args.ports)
 
-    low('Skipfish scan completed.')
-    return fname
-
-
-def zap_quickurl(target: Host, port: str) -> str:
-    """
-        OWASP-Zap scan to quickly scan web app elements. Uses the zaproxy command in cmd mode.
-    """
-    return
+    return hosts

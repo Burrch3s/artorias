@@ -1,6 +1,7 @@
 # Contains Host Object Info
 
 from core.result import Results
+from settings import WEB_PORTS, AUTH_PORTS
 
 class Host():
     """
@@ -14,7 +15,7 @@ class Host():
 
         self._services = None
 
-        self._open_ports = []
+        self._open_ports = None
 
         self._nikto_result = None
 
@@ -65,8 +66,8 @@ class Host():
         """
         Determine if host has a port that is commonly known as a web interface
         """
-        for service in self._services.get_results()['ports']:
-            if service['id'] in ('80', '443', '8080'):
+        for port in self._open_ports:
+            if port in WEB_PORTS:
                 return True
         return False
 
@@ -75,8 +76,7 @@ class Host():
         Determine if host has ports/services suitable to run brute force against for
         credentials.
         """
-        auth = ['80', '443', '21', '22', '23']
-        for service in self._services.get_results()['ports']:
-            if service['id'] in auth:
+        for port in self._open_ports:
+            if port in AUTH_PORTS:
                 return True
         return False
