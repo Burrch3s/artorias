@@ -23,17 +23,21 @@
 ## Installation
 
 > `virtualenv -p python3 art ; . art/bin/activate # optional steps, but recommended`
+
 > `git clone git@github.com:Burrch3s/artorias.git`
+
 > `cd artorias ; pip install -r requirements.txt`
+
 > `pushd scanners; sudo ./install_scanners.sh; popd # OR just install nikto, owasp-zap, nmap, hydra and wordlist that's pointed to by settings.py`
+
 > Then you should be good to go. Artorias utilizes the argparse module, so -h will display help messages for args
 
 ## Layout of Project
 
 #### core
 
-> Contains most code and object definitions for the project. Handling of tests and
-scans happens here as well.
+> Contains most code and object definitions for the project. Handling of the test and
+scan commands happen here as well.
 
 #### core/scans
 
@@ -42,7 +46,7 @@ override the parent classes methods
 
 #### dev
 
-> Dev scripts and templates for developers
+> Scripts and templates for developers
 
 #### scanners
 
