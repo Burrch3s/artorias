@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 
-"""Artorias main file, kicks off the rest of the project"""
+"""
+Artorias main file, kicks off the rest of the project. Either run scan(s) individually with
+the scan arg, or run all of them with the test arg.
+"""
 
 import logging
 from core.args import parse_cmd
 from core.testing import handle_test
+from core.scanning import handle_scan
 
 def main() -> int:
     """
-        Call parse_cmd and hand off execution accordingly
+    Call parse_cmd and hand off execution accordingly
     """
     arguments = parse_cmd()
 

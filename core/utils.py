@@ -1,5 +1,6 @@
 """Util Functions used within the core directory"""
 
+import importlib
 from os import listdir
 from xmltodict import parse
 from json import dumps, loads
@@ -8,7 +9,6 @@ from retrying import retry
 from subprocess import Popen, DEVNULL
 from core.host import Host
 from core.result import Results
-from core.scanning import *
 from log import *
 from zapv2 import ZAPv2
 
@@ -45,7 +45,7 @@ def start_zap():
         zap.urlopen('http://127.0.0.1')
     except:
         low("Starting the zaproxy application.")
-        zap_app = Popen(['zaproxy'], stdout=DEVNULL, stderr=DEVNULL)
+        Popen(['zaproxy'], stdout=DEVNULL, stderr=DEVNULL)
         wait_for_zap()
 
 def zap_setup_context(target: Host, port: str, user: str, passwd: str) -> tuple:
@@ -113,3 +113,69 @@ def file_to_class_name(f_name: str) -> str:
     Take the file name of a scan and return the name of it as a class: snake to camel case
     """
     return "".join(word.title() for word in f_name.split('_'))
+
+def run_scans(host: Host, scans_to_run: list, force: bool = False) -> None:
+    """
+    Checks if a host meets prerequisites for scans, and runs them.
+    """
+    # TODO research implementing Threads for this
+    # TODO add fault tolerance
+    #
+    # Iterate over all available tests in the core/scans directory
+    # Import the module from core.scans, then the class from the module
+    # and finally initialize the class, passing the host to scan.
+    for scan in scans_to_run:
+        module = importlib.import_module("core.scans.{}".format(scan))
+        temp = getattr(module, file_to_class_name(scan))
+        current_scan = temp(host)
+
+        if current_scan.requirements_met() and not force:
+            current_scan.set_config()
+            low("Starting {} scan.".format(temp))
+            current_scan.run_scan()
+        elif force:
+            current_scan.set_config()
+            warning("Forcing {} scan to run.".format(temp))
+            current_scan.run_scan()
+        else:
+            low("Requirements not met for {} scan, skipping.".format(temp))
+
+def host_scan(subnet: str) -> str:
+    """
+        Drive nmap host scan, save output to a file and return output file name.
+    """
+    # File name to save output to
+    fname = '{}/host_scan{}.xml'.format(SCAN_OUTPUT_DIR, datetime.now().strftime('%m-%d_%H-%M-%S'))
+
+    # Drive host scan and output to file
+    nmap = Popen(['nmap', subnet, '-sn', '-oX', fname], stdout=DEVNULL, stderr=DEVNULL)
+    low("Waiting for host scan to complete.")
+
+    nmap.wait()
+
+    low("Host scan completed.")
+    return fname
+
+def skipfish_scan(target: Host, port: str) -> str:
+    """
+        DEPRECATED: TODO re-evaulate it's worth, then potentially create Scan
+        Drive Skipfish scan against a specified port, save output to a file and return
+        outpu file name.
+    """
+    # File name to save output to
+    fname = '{}/skipfish_scan{}_{}.xml'.format(SCAN_OUTPUT_DIR, port, datetime.now().strftime(
+        '%m-%d_%H-%M-%S'))
+
+    skipfish = Popen(['skipfish', '-o', fname, str(target)])
+    low('Waiting for Skipfish scan on port {} to complete.'.format(port))
+
+    skipfish.wait()
+
+    low('Skipfish scan completed.')
+    return fname
+
+def zap_quickurl(target: Host, port: str) -> str:
+    """
+        OWASP-Zap scan to quickly scan web app elements. Uses the zaproxy command in cmd mode.
+    """
+    return

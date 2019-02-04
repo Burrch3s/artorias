@@ -1,7 +1,5 @@
 """The beef of Artorias testing code"""
 
-
-import importlib
 from argparse import Namespace
 from core.utils import *
 from core.host import Host
@@ -64,38 +62,6 @@ def prereq_scans(host: Host, scans_to_skip: list) -> None:
     else:
         low("Username and password supplied, skipping auth scan.")
 
-def run_scans(host: Host, scans_to_skip: list) -> None:
-    """
-    Checks if a host meets prerequisites for scans, and runs them.
-    """
-    prereq_scans(host, scans_to_skip)
-
-    # Begin dynamic scan execution
-    all_scans = get_all_scans()
-    scans_to_run = list(set(all_scans) - set(scans_to_skip))
-
-    # TODO research implementing Threads for this
-    # Port scan
-    # Auth scan
-    # Threads >> point to func that inits every scan and runs them?
-    #
-    # TODO add fault tolerance
-    #
-    # Iterate over all available tests in the core/scans directory
-    # Import the module from core.scans, then the class from the module
-    # and finally initialize the class, passing the host to scan.
-    for scan in scans_to_run:
-        module = importlib.import_module("core.scans.{}".format(scan))
-        temp = getattr(module, file_to_class_name(scan))
-        current_scan = temp(host)
-
-        if current_scan.requirements_met():
-            current_scan.set_config()
-            low("Starting {} scan.".format(temp))
-            current_scan.run_scan()
-        else:
-            low("Requirements not met for {} scan, skipping.".format(temp))
-
 def handle_test(args: Namespace) -> bool:
     """
     Handle test command, running all scans
@@ -107,7 +73,14 @@ def handle_test(args: Namespace) -> bool:
         skip_tests.append('hydra_scan')
 
     debug(skip_tests)
+
+    # Begin dynamic scan execution
+    all_scans = get_all_scans()
+    scans_to_run = list(set(all_scans) - set(skip_tests))
+
     for host in hosts:
-        run_scans(host, skip_tests)
+        # Port scan, Auth scan
+        prereq_scans(host, skip_tests)
+        run_scans(host, scans_to_run, skip_tests)
 
     return True

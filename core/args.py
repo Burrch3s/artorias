@@ -15,6 +15,7 @@ def parse_cmd() -> argparse.Namespace:
         'scanScans': "Scans to run, either singular or a list of them.",
         'scanPorts': "Ports that the target has to run scans on.",
         'scanCredentials': "<user>:<password> combintation to use on targets authenticated services.",
+        'scanTarget': "Target(s) to run tests on",
         'test': "Run a series of scans, preconfigured to test aspects of an IoT host." \
                 + "The recommended option to using this scanner/framework",
         'testAll': "Run all tests possible",
@@ -44,6 +45,7 @@ def parse_cmd() -> argparse.Namespace:
         choices=["info", "debug", "warning", "error"],
         help=msg['testLog'])
 
+    # Separate args by the command they are applicable for
     subparser = parser.add_subparsers(
         dest="command",
         help=msg['subparser'])
@@ -56,19 +58,30 @@ def parse_cmd() -> argparse.Namespace:
     scan.add_argument(
         "-s",
         "--scans",
-        type=list,
-        choices=['nikto', 'hydra', 'zap-spider'],
+        type=str,
+        nargs='+',
+        choices=['nikto_scan', 'hydra_scan', 'zap_spider_scan'],
         help=msg['scanScans'])
     scan.add_argument(
         "-p",
         "--ports",
-        type=list,
+        type=str,
+        nargs='+',
+        required=True,
         help=msg['scanPorts'])
     scan.add_argument(
         "-c",
         "--credentials",
         type=str,
         help=msg['scanCredentials'])
+    scan.add_argument(
+        "-t",
+        "--target",
+        nargs='+',
+        type=str,
+        default=[],
+        required=True,
+        help=msg['scanTarget'])
 
     # artorias test ${args}
     test = subparser.add_parser(

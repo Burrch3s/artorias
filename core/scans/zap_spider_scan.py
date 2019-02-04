@@ -25,8 +25,13 @@ class ZapSpiderScan(Scan):
         return self.target.has_web_interface()
 
     def set_config(self) -> None:
-        self.user = self.target.get_credentials()['user']
-        self.password = self.target.get_credentials()['passwd']
+        try:
+            self.user = self.target.get_credentials()['user']
+            self.password = self.target.get_credentials()['passwd']
+        except KeyError:
+            low("No USER/PASS provided for zap scan, running without them.")
+            self.user = ""
+            self.password = ""
 
         for temp in self.target.get_open_ports():
             if temp in ('80', '8080', '443'):
