@@ -10,23 +10,23 @@ class TestCoreHost(unittest.TestCase):
         self.host._services = MagicMock()
 
     def test_has_web_interface(self):
-        self.host._services.get_results.return_value = {'ports': [{'id': '80'}]}
+        self.host._open_ports = ['80']
 
         ret = self.host.has_web_interface()
         self.assertEquals(ret, True)
 
-        self.host._services.get_results.return_value = {'ports': [{'id': '22'}]}
+        self.host._open_ports = ['22']
 
         ret = self.host.has_web_interface()
         self.assertEquals(ret, False)
 
     def test_has_auth_surface(self):
-        self.host._services.get_results.return_value = {'ports': [{'id': '22'}]}
+        self.host._open_ports = ['22']
 
         ret = self.host.has_auth_surface()
         self.assertEquals(ret, True)
 
-        self.host._services.get_results.return_value = {'ports': [{'id': '8080'}]}
+        self.host._open_ports = ['8080']
 
         ret = self.host.has_auth_surface()
         self.assertEquals(ret, False)
