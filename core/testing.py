@@ -24,7 +24,7 @@ def handle_args(args: Namespace) -> list:
     if args.user and args.passwd:
         low("Username and Password supplied for tests, {}:{}".format(args.user, args.passwd))
         for host in hosts:
-            host.set_credentials({'user': args.user, 'passwd': args.passwd})
+            host.credentials = {'user': args.user, 'passwd': args.passwd}
 
     return hosts
 
@@ -37,14 +37,14 @@ def prereq_scans(host: Host, scans_to_skip: list) -> None:
     port_scan = PortScan(host)
     if port_scan.requirements_met:
         port_scan.run_scan()
-        host.set_services(port_scan.process_results())
-        temp = [port['id'] for port in host.get_services().get_results()['ports']]
-        host.set_open_ports(temp)
+        host.services = port_scan.process_results()
+        temp = [port['id'] for port in host.services.results['ports']]
+        host.open_ports = temp
     else:
         low('Prerequisites not met for PortScan.')
         return
 
-    debug(host.get_services())
+    debug(host.services)
     debug("HAS AUTH: {}".format(host.has_auth_surface()))
     debug("HAS WEB: {}".format(host.has_web_interface()))
 
@@ -55,10 +55,10 @@ def prereq_scans(host: Host, scans_to_skip: list) -> None:
         hydra_scan.set_config()
         hydra_scan.run_scan()
         creds = hydra_scan.process_results()
-        host.set_credentials({
+        host.credentials = {
             'user': creds['results'][0]['login'],
             'passwd': creds['results'][0]['password']
-        })
+        }
     else:
         low("Username and password supplied, skipping auth scan.")
 

@@ -26,40 +26,58 @@ class Host():
     def __str__(self) -> str:
         return self._ip
 
-    def get_ip(self) -> str:
+    @property
+    def ip(self) -> str:
+        """IP of the host being scanned"""
         return self._ip
 
-    def get_services(self) -> Results:
+    @ip.setter
+    def ip(self, new_ip: str) -> None:
+        self._ip = new_ip
+
+    @property
+    def services(self) -> Results:
+        """Raw results of services up from PortScan"""
         return self._services
 
-    def get_nikto_result(self) -> Results:
-        return self._nikto_result
-
-    def get_zap_result(self) -> Results:
-        return self._zap_result
-
-    def get_credentials(self) -> dict:
-        return self._credentials
-
-    def get_open_ports(self) -> list:
-        return self._open_ports
-
-    def set_ip(self, ip: str) -> None:
-        self._ip = ip
-
-    def set_services(self, services: list) -> None:
+    @services.setter
+    def services(self, services: list) -> None:
         self._services = services
 
-    def set_nikto_result(self, result: Results) -> None:
+    @property
+    def nikto_result(self) -> Results:
+        """Results from a NiktoScan"""
+        return self._nikto_result
+
+    @nikto_result.setter
+    def nikto_result(self, result: Results) -> None:
         self._nikto_result = result
 
-    def set_zap_result(self, result: Results) -> None:
+    @property
+    def zap_result(self) -> Results:
+        """Results from ZapSpiderScan"""
+        return self._zap_result
+
+    @zap_result.setter
+    def zap_result(self, result: Results) -> None:
         self._zap_result = result
 
-    def set_credentials(self, creds: dict) -> None:
+    @property
+    def credentials(self) -> dict:
+        """Credentials, user/passwd for authentication with the host"""
+        return self._credentials
+
+    @credentials.setter
+    def credentials(self, creds: dict) -> None:
         self._credentials.update(creds)
 
-    def set_open_ports(self, ports: list) -> None:
+    @property
+    def open_ports(self) -> list:
+        """List of the available port numbers open or to use on scans"""
+        return self._open_ports
+
+    @open_ports.setter
+    def open_ports(self, ports: list) -> None:
         self._open_ports = ports
 
     def has_web_interface(self) -> bool:

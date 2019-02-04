@@ -1,4 +1,7 @@
-# Contains Result Object Info
+"""
+Contains Result Object Info. The scan name is returned whenever str(Results) is called,
+to easily allow getting the name of the scan.
+"""
 
 class Results():
     """
@@ -17,9 +20,11 @@ class Results():
     def __int__(self) -> int:
         return len(self._results)
 
-    def get_results(self) -> dict:
+    @property
+    def results(self):
+        """Property for the actual results"""
         return self._results
 
-    def set_results(self, res: dict) -> None:
+    @results.setter
+    def results(self, res: dict) -> None:
         self._results = res
-

@@ -33,7 +33,7 @@ class HydraScan(Scan):
         return self.target.has_auth_surface()
 
     def set_config(self) -> None:
-        for temp in self.target.get_open_ports():
+        for temp in self.target.open_ports:
             if temp in self.hydra_ports:
                 port = temp
                 break

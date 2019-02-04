@@ -1,4 +1,4 @@
-""" Scan object to layout basic template of creating a scan"""
+"""Scan object to layout basic template of creating a scan"""
 
 from core.result import Results
 from log import low

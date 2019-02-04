@@ -27,7 +27,8 @@ class TestCoreTesting(unittest.TestCase):
 
         hosts = handle_args(args)
         mock_get.assert_called_with(mock_sub(args.subnet))
-        host.set_credentials.assert_called_with({'user': args.user, 'passwd': args.passwd})
+        self.assertEquals(host.credentials['user'], args.user)
+        self.assertEquals(host.credentials['passwd'], args.passwd)
         self.assertEquals(len(hosts), 1)
 
     def test_prereq_scans(self):

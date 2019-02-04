@@ -23,14 +23,14 @@ class NiktoScan(Scan):
 
     def set_config(self) -> None:
         try:
-            self.user = self.target.get_credentials()['user']
-            self.password = self.target.get_credentials()['passwd']
+            self.user = self.target.credentials['user']
+            self.password = self.target.credentials['passwd']
         except KeyError:
             low("User/Pass not supplied for nikto scan, running without credentials.")
             self.user = ""
             self.password = ""
 
-        for temp in self.target.get_open_ports():
+        for temp in self.target.open_ports:
             if temp in WEB_PORTS:
                 self.port = temp
                 break
