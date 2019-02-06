@@ -17,11 +17,9 @@ class Host():
 
         self._open_ports = None
 
-        self._nikto_result = None
-
-        self._zap_result = None
-
         self._credentials = {}
+
+        self._scans = list()
 
     def __str__(self) -> str:
         return self._ip
@@ -45,24 +43,6 @@ class Host():
         self._services = services
 
     @property
-    def nikto_result(self) -> Results:
-        """Results from a NiktoScan"""
-        return self._nikto_result
-
-    @nikto_result.setter
-    def nikto_result(self, result: Results) -> None:
-        self._nikto_result = result
-
-    @property
-    def zap_result(self) -> Results:
-        """Results from ZapSpiderScan"""
-        return self._zap_result
-
-    @zap_result.setter
-    def zap_result(self, result: Results) -> None:
-        self._zap_result = result
-
-    @property
     def credentials(self) -> dict:
         """Credentials, user/passwd for authentication with the host"""
         return self._credentials
@@ -79,6 +59,15 @@ class Host():
     @open_ports.setter
     def open_ports(self, ports: list) -> None:
         self._open_ports = ports
+
+    @property
+    def scans(self) -> list:
+        """List of Results from scans on the host"""
+        return self._scans
+
+    @scans.setter
+    def scans(self, new_scan):
+        self._scans.append(new_scan)
 
     def has_web_interface(self) -> bool:
         """

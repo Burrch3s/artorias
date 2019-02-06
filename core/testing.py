@@ -37,9 +37,8 @@ def prereq_scans(host: Host, scans_to_skip: list) -> None:
     port_scan = PortScan(host)
     if port_scan.requirements_met:
         port_scan.run_scan()
-        host.services = port_scan.process_results()
-        temp = [port['id'] for port in host.services.results['ports']]
-        host.open_ports = temp
+        host.services = port_scan.process_results().results
+        host.open_ports = [port['id'] for port in host.services['ports']]
     else:
         low('Prerequisites not met for PortScan.')
         return
@@ -81,6 +80,6 @@ def handle_test(args: Namespace) -> bool:
     for host in hosts:
         # Port scan, Auth scan
         prereq_scans(host, skip_tests)
-        run_scans(host, scans_to_run, skip_tests)
+        run_scans(host, scans_to_run)
 
     return True

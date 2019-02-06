@@ -129,14 +129,17 @@ def run_scans(host: Host, scans_to_run: list, force: bool = False) -> None:
         temp = getattr(module, file_to_class_name(scan))
         current_scan = temp(host)
 
+        print('force', force)
         if current_scan.requirements_met() and not force:
             current_scan.set_config()
             low("Starting {} scan.".format(temp))
             current_scan.run_scan()
+            host.scans = current_scan.process_results()
         elif force:
             current_scan.set_config()
             warning("Forcing {} scan to run.".format(temp))
             current_scan.run_scan()
+            host.scans = current_scan.process_results()
         else:
             low("Requirements not met for {} scan, skipping.".format(temp))
 

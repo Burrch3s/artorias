@@ -41,8 +41,10 @@ def handle_args(args: Namespace) -> list:
         else:
             low("User and Password supplied for scans, {}".format(args.credentials))
             for host in hosts:
-                host.credentials = {'user': args.credentials.split(':')[0],
-                                      'passwd': args.credentials.split(':')[1]}
+                host.credentials = {
+                    'user': args.credentials.split(':')[0],
+                    'passwd': args.credentials.split(':')[1]
+                }
 
     for host in hosts:
         host.open_ports = args.ports
