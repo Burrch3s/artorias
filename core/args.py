@@ -60,14 +60,13 @@ def parse_cmd() -> argparse.Namespace:
         "--scans",
         type=str,
         nargs='+',
-        choices=['nikto_scan', 'hydra_scan', 'zap_spider_scan'],
+        choices=['nikto_scan', 'hydra_scan', 'zap_spider_scan', 'nmap_os_scan'],
         help=msg['scanScans'])
     scan.add_argument(
         "-p",
         "--ports",
         type=str,
         nargs='+',
-        required=True,
         help=msg['scanPorts'])
     scan.add_argument(
         "-c",
