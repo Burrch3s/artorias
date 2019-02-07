@@ -1,6 +1,6 @@
 """Util Functions used within the core directory"""
 
-import importlib
+from importlib import import_module
 from os import listdir
 from xmltodict import parse
 from json import dumps, loads
@@ -125,11 +125,10 @@ def run_scans(host: Host, scans_to_run: list, force: bool = False) -> None:
     # Import the module from core.scans, then the class from the module
     # and finally initialize the class, passing the host to scan.
     for scan in scans_to_run:
-        module = importlib.import_module("core.scans.{}".format(scan))
+        module = import_module("core.scans.{}".format(scan))
         temp = getattr(module, file_to_class_name(scan))
         current_scan = temp(host)
 
-        print('force', force)
         if current_scan.requirements_met() and not force:
             current_scan.set_config()
             low("Starting {} scan.".format(temp))

@@ -95,3 +95,25 @@ class TestCoreUtils(unittest.TestCase):
 
         self.assertEquals(c_id, 'c_id')
         self.assertEquals(u_id, 'u_id')
+
+    @patch('core.utils.wait_for_zap')
+    @patch('core.utils.Popen')
+    @patch('core.utils.low')
+    @patch('core.utils.ZAPv2')
+    def test_start_zap(self, mock_zap, mock_low, mock_popen, mock_wait):
+        start_zap()
+        mock_zap().urlopen.assert_called_with('http://127.0.0.1')
+        self.assertEquals(len(mock_popen.mock_calls), 0)
+        self.assertEquals(len(mock_wait.mock_calls), 0)
+
+        mock_zap.return_value.urlopen.side_effect = IOError
+        start_zap()
+        self.assertEquals(len(mock_popen.mock_calls), 1)
+        self.assertEquals(len(mock_wait.mock_calls), 1)
+
+    def test_run_scans(self):
+        # Need to come up with a good way of testing this function..
+        # reading the docs seems to show that it may not be possible to patch the
+        # use of us calling getattr() in the actual run_scans function:
+        # https://docs.python.org/3/library/unittest.mock.html
+        pass
