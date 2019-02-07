@@ -1,4 +1,4 @@
-"""Default template of a scan"""
+"""Performs zap spider scan of host web interface"""
 
 # Generic imports to utilize
 from time import sleep
@@ -20,7 +20,7 @@ class ZapSpiderScan(Scan):
 
     def requirements_met(self) -> bool:
         """
-        Check to be performed if the target meets requirements
+        Check that host has a web interface
         """
         return self.target.has_web_interface()
 
@@ -40,8 +40,7 @@ class ZapSpiderScan(Scan):
 
     def run_scan(self) -> None:
         """
-        Perform actual scan. It is absolutely ok to implement other functions to help
-        run_scan and reduce complexity.
+        Runs zap spider scan with a context including user/pass IF that is available to do so
         """
         start_zap()
         zap = ZAPv2()

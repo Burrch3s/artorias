@@ -46,8 +46,7 @@ class HydraScan(Scan):
 
     def run_scan(self) -> None:
         """
-        Perform actual scan. It is absolutely ok to implement other functions to help
-        run_scan and reduce complexity.
+        Perform actual scan by brute forcing the service available on the host
         """
         # File name to save output to
         self.output_name = '{}/hydra_scan{}_{}.json'.format(SCAN_OUTPUT_DIR, self.service, datetime.now().strftime(

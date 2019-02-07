@@ -1,7 +1,5 @@
 """
-TODO implement execution of select scans from core/scans and perhaps implement interactive
-shell for that
-TODO remove scans
+Module handling the scan argument and values passed from it when calling artorias
 """
 
 from argparse import Namespace

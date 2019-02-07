@@ -47,7 +47,7 @@ class PortScan(Scan):
         for port in ports:
             tmp = {}
             tmp['id'] = port['@portid']
-            tmp['name'] = port ['service']['@name']
+            tmp['name'] = port['service']['@name']
             tmp['state'] = port['state']['@state']
             port_info['ports'].append(tmp)
 

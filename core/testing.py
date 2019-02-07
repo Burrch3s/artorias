@@ -1,4 +1,4 @@
-"""The beef of Artorias testing code"""
+"""The beef of Artorias testing code. Handles the test argument passed when calling artorias"""
 
 from argparse import Namespace
 from core.utils import *
@@ -10,7 +10,7 @@ from core.scans.hydra_scan import HydraScan
 
 def handle_args(args: Namespace) -> list:
     """
-        Parse arguments for test and configure host objects.
+    Parse arguments for test and configure host objects.
     """
     # If no targets provided, assume were finding them on network.
     # Once we have targets, if no test given, port/service scan them.

@@ -1,4 +1,4 @@
-"""Default template of a scan"""
+"""Perform nmap OS fingerprint scan"""
 
 # Generic imports to utilize
 from os import geteuid
@@ -38,7 +38,7 @@ class NmapOsScan(Scan):
 
     def process_results(self) -> Results:
         """
-        Take only the necessary info out of scan result: OS type, kernel version
+        TODO Take only the necessary info out of scan result: OS type, kernel version
         """
         scan_info = xml2json(self.output_name)
         print(scan_info)

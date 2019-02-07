@@ -1,4 +1,4 @@
-"""Default template of a scan"""
+"""Perform nikto web app scan"""
 
 # Generic imports to utilize
 from datetime import datetime
@@ -37,8 +37,7 @@ class NiktoScan(Scan):
 
     def run_scan(self) -> None:
         """
-        Perform actual scan. It is absolutely ok to implement other functions to help
-        run_scan and reduce complexity.
+        Runs actual nikto web app scan with basic args
         """
         self.output_name = '{}/nikto_scan{}_{}.xml'.format(SCAN_OUTPUT_DIR, self.port, datetime.now().strftime(
             DATE_ARGS))

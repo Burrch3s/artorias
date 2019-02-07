@@ -14,7 +14,7 @@ from zapv2 import ZAPv2
 
 def get_hosts(subnet: str) -> list:
     """
-        Perform nmap host scan and return a list of hosts on network to assess
+    Perform nmap host scan and return a list of hosts on network to assess
     """
     hosts = []
     scan_info = xml2json(host_scan(subnet))
@@ -63,7 +63,6 @@ def zap_setup_context(target: Host, port: str, user: str, passwd: str) -> tuple:
     low("Creating new context for zap scan.")
     context_id = zap.context.new_context("ZapScan")
 
-    # Default listening for zap is 8090
     zap.context.include_in_context("ZapScan", "{}.*".format(str(target)))
     zap.context.include_in_context("ZapScan", "{}.*".format(url))
     zap.authentication.set_authentication_method(
@@ -82,7 +81,7 @@ def zap_setup_context(target: Host, port: str, user: str, passwd: str) -> tuple:
 
 def verify_subnet(subnet: str) -> str:
     """
-        Verify and return valid subnet
+    Verify and return valid subnet
     """
     if len(subnet.split('.')) != 4:
         return ''
@@ -144,7 +143,7 @@ def run_scans(host: Host, scans_to_run: list, force: bool = False) -> None:
 
 def host_scan(subnet: str) -> str:
     """
-        Drive nmap host scan, save output to a file and return output file name.
+    Drive nmap host scan, save output to a file and return output file name.
     """
     # File name to save output to
     fname = '{}/host_scan{}.xml'.format(SCAN_OUTPUT_DIR, datetime.now().strftime('%m-%d_%H-%M-%S'))
@@ -178,6 +177,6 @@ def skipfish_scan(target: Host, port: str) -> str:
 
 def zap_quickurl(target: Host, port: str) -> str:
     """
-        OWASP-Zap scan to quickly scan web app elements. Uses the zaproxy command in cmd mode.
+    OWASP-Zap scan to quickly scan web app elements. Uses the zaproxy command in cmd mode.
     """
     return
