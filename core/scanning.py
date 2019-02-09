@@ -3,12 +3,9 @@ Module handling the scan argument and values passed from it when calling artoria
 """
 
 from argparse import Namespace
-from datetime import datetime
-from subprocess import Popen, DEVNULL
 from core.host import Host
 from core.utils import file_to_class_name, run_scans
-from log import low, warning, error
-from settings import SCAN_OUTPUT_DIR, WORD_LIST
+from log import low, warning
 
 def handle_scan(args: Namespace) -> bool:
     """

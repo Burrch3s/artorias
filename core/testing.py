@@ -3,7 +3,7 @@
 from argparse import Namespace
 from core.utils import *
 from core.host import Host
-from log import *
+from log import low, debug
 from core.scans.port_scan import PortScan
 from core.scans.hydra_scan import HydraScan
 

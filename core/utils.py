@@ -2,15 +2,17 @@
 
 from importlib import import_module
 from os import listdir
-from xmltodict import parse
+from subprocess import Popen, DEVNULL
 from json import dumps, loads
 from time import sleep
+from datetime import datetime
+from xmltodict import parse
 from retrying import retry
-from subprocess import Popen, DEVNULL
+from zapv2 import ZAPv2
 from core.host import Host
 from core.result import Results
-from log import *
-from zapv2 import ZAPv2
+from log import low, warning, error
+from settings import SCAN_OUTPUT_DIR
 
 def get_hosts(subnet: str) -> list:
     """
