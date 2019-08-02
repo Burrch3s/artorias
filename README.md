@@ -1,6 +1,10 @@
 # Artorias IoT Security Testing Framework
 [![Build Status](https://travis-ci.com/Burrch3s/artorias.svg?branch=master)](https://travis-ci.com/Burrch3s/artorias)[![Coverage Status](https://coveralls.io/repos/github/Burrch3s/artorias/badge.svg)](https://coveralls.io/github/Burrch3s/artorias)
 
+Artorias is a framework to drive other host or web app scanners. Artorias started
+with the intention of targetting IoT devices, but makes no real distinction
+between them and a normal desktop.
+
 #### Test specific targets, or subnet of targets for vulnerabilities (Black Box)
 
 -Identify OS Type
@@ -31,6 +35,7 @@
 > `pushd scanners; sudo ./install_scanners.sh; popd # OR just install nikto, owasp-zap, nmap, hydra and wordlist that's pointed to by settings.py`
 
 > Then you should be good to go. Artorias utilizes the argparse module, so -h will display help messages for args
+
 
 ## Layout of Project
 
@@ -78,3 +83,12 @@ in the future, it would be for the best to implement some kind of integration te
 -Take everything that is listed above and provide meaningful feedback
 
 -Consult NIST, OWASP and other guidelines in attempt to rank findings
+
+#### Provide Dockerfile to run artorias
+
+-Take care of all the setup for users to run artorias; make everyones life simple
+
+#### Get more scanners in here
+
+-Supporting more scanners is a real must. Custom scans can also be done if
+written in Python!
