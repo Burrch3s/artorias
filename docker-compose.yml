@@ -1,0 +1,7 @@
+version: '2.0'
+
+services:
+  artorias:
+    image: artorias
+    network_mode: "host"
+    working_dir: "/artorias"
